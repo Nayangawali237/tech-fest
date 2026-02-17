@@ -28,5 +28,6 @@ jobs:
       run: |
         ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
           cd /var/www/html &&
-          git pull origin main
+          git fetch origin main &&
+          git reset --hard origin/main
         "
