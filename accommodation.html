@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accommodation - Techfest 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --bg: #030305;
+            --accent: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --nav-bg: rgba(10, 10, 15, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+            --input-bg: rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-mode {
+            --bg: #fdfdfd;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(15, 23, 42, 0.08);
+            --card-bg: #ffffff;
+            --accent: #4f46e5;
+            --btn-bg: #0f172a;
+            --btn-text: #ffffff;
+            --primary: #4f46e5;
+            --input-bg: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .dynamic-text {
+            color: var(--text-main);
+            transition: color 0.5s ease;
+        }
+
+        .dynamic-dim {
+            color: var(--text-dim);
+            transition: color 0.5s ease;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-float {
+            background: var(--nav-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5),
+                0 5px 15px -5px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.4s ease, background 0.5s ease;
+        }
+
+        body.light-mode .nav-float {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 14px;
+            transition: color 0.4s ease;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-link.active {
+            color: var(--bg);
+        }
+
+        body.light-mode .nav-link.active {
+            color: #fff;
+        }
+
+        .nav-indicator {
+            position: absolute;
+            height: calc(100% - 8px);
+            top: 4px;
+            left: 4px;
+            background: var(--primary);
+            border-radius: 40px;
+            z-index: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- CONTENT CARDS --- */
+        .info-card-v2 {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.4s ease;
+        }
+
+        .info-card-v2:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(0, 242, 255, 0.1);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.1);
+        }
+
+        .btn-primary-v2 {
+            background: var(--primary);
+            color: var(--bg);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(0, 242, 255, 0.3);
+        }
+
+        .btn-primary-v2:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .rule-item {
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .rule-icon {
+            color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor hidden md:block"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="grid-lines"></div>
+
+    <!-- Header -->
+    <header class="fixed top-8 left-0 w-full z-[100] px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="logo">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <span
+                        class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
+                        2.0</span>
+                </a>
+            </div>
+
+            <div class="flex items-center">
+                <div class="nav-float hidden xl:flex">
+                    <div class="nav-indicator" id="nav-indicator"></div>
+                    <div class="nav-links-container" id="nav-container">
+                        <a href="index.html" class="nav-link">Home</a>
+                        <a href="events.html" class="nav-link">Events</a>
+                        <a href="registrations.html" class="nav-link">Register</a>
+                        <a href="accommodation.html" class="nav-link active">Stay</a>
+                        <a href="team.html" class="nav-link">Team</a>
+                        <a href="sponsors.html" class="nav-link">Sponsors</a>
+                        <a href="about.html" class="nav-link">About</a>
+                        <a href="contact.html" class="nav-link">Contact</a>
+                    </div>
+                </div>
+
+                <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
+                    <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+
+            <a href="registrations.html"
+                class="hidden md:block bg-white text-black text-[10px] uppercase font-black px-8 py-3.5 rounded-full hover:bg-cyan-400 transition-all">Book
+                Now</a>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="pt-48 pb-20 relative overflow-hidden">
+        <div class="container max-w-7xl mx-auto px-6 text-center">
+            <div class="reveal active">
+                <span
+                    class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Home
+                    Away From Home</span>
+                <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Stay
+                    <br><span class="text-primary italic">Arrangements</span></h1>
+                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">Focus on the innovation
+                    while we take care of your comfort. High-quality stay facilities for all outstation participants.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Cards Section -->
+    <section class="pb-24 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="info-card-v2 reveal active">
+                    <h3 class="text-xl font-black mb-4 dynamic-text flex items-center gap-3">
+                        <span class="text-2xl">🏨</span> Eligibility
+                    </h3>
+                    <p class="dynamic-dim text-sm leading-relaxed">Available for all outstation participants. You must
+                        be registered for at least one technical or creative event to qualify.</p>
+                </div>
+                <div class="info-card-v2 reveal active" style="transition-delay: 0.1s;">
+                    <h3 class="text-xl font-black mb-4 dynamic-text flex items-center gap-3">
+                        <span class="text-2xl">💰</span> Charges
+                    </h3>
+                    <p class="dynamic-dim text-sm leading-relaxed font-bold text-primary mb-2">₹300 per person per night
+                    </p>
+                    <p class="dynamic-dim text-xs leading-relaxed">Includes shared dormitory, 24/7 security, and
+                        essential utilities.</p>
+                </div>
+                <div class="info-card-v2 reveal active" style="transition-delay: 0.2s;">
+                    <h3 class="text-xl font-black mb-4 dynamic-text flex items-center gap-3">
+                        <span class="text-2xl">📅</span> Duration
+                    </h3>
+                    <p class="dynamic-dim text-sm leading-relaxed">March 14 (Check-in: 2 PM) to March 17 (Check-out: 12
+                        PM). Extensions subject to availability.</p>
+                </div>
+            </div>
+
+            <!-- Rules Section -->
+            <div class="info-card-v2 reveal active mb-24">
+                <h2 class="text-3xl font-black mb-10 dynamic-text text-center">Rules & Guidelines</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <p class="dynamic-dim text-sm">Valid College ID and Aadhar Card are mandatory for check-in.</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <p class="dynamic-dim text-sm">Accommodation is on a shared basis (6-8 people per room/dorm).
+                        </p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <p class="dynamic-dim text-sm">Strict 11 PM curfew. Entry after this requires written
+                            permission.</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <p class="dynamic-dim text-sm">Zero tolerance for smoking, alcohol, or illegal substances.</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <p class="dynamic-dim text-sm">Participants are responsible for their own electronics and
+                            valuables.</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <p class="dynamic-dim text-sm">Management reserves the right to cancel stay for disciplinary
+                            issues.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="max-w-3xl mx-auto reveal active">
+                <div class="info-card-v2 p-8 md:p-12">
+                    <h2 class="text-3xl font-black mb-4 dynamic-text text-center">Request Form</h2>
+                    <p class="dynamic-dim text-center text-sm mb-12">Submit your details and our team will coordinate
+                        your stay.</p>
+
+                    <form onsubmit="event.preventDefault(); showSuccess();" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Full
+                                    Name</label>
+                                <input type="text" required class="form-control" placeholder="Lead Name">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">College</label>
+                                <input type="text" required class="form-control" placeholder="Institution Name">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Gender</label>
+                                <select required class="form-control">
+                                    <option value="">Select</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Number
+                                    of Nights</label>
+                                <select required class="form-control">
+                                    <option value="">Select</option>
+                                    <option>1 Night (₹300)</option>
+                                    <option>2 Nights (₹600)</option>
+                                    <option>3 Nights (₹900)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Check-in
+                                    Date</label>
+                                <input type="date" required class="form-control">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Phone
+                                    Number</label>
+                                <input type="tel" required class="form-control" placeholder="+91">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Special
+                                Requirements</label>
+                            <textarea rows="4" class="form-control"
+                                placeholder="Any medical conditions or special requests..."></textarea>
+                        </div>
+
+                        <div class="text-center pt-8">
+                            <button type="submit" class="btn-primary-v2 w-full md:w-auto px-16">Submit Request</button>
+                        </div>
+                    </form>
+
+                    <div id="success-msg"
+                        class="hidden mt-8 p-6 rounded-xl border border-primary/20 bg-primary/5 text-center">
+                        <p class="text-primary font-bold">⚡ Request Received!</p>
+                        <p class="text-xs dynamic-dim mt-2">Check your email for confirmation and payment details.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 border-t border-white/5 text-center relative z-20">
+        <p class="text-[9px] uppercase tracking-[0.8em] dynamic-dim opacity-30">
+            &copy; 2026 Techfest 2.0 | ISTE TEAM
+        </p>
+    </footer>
+
+    <script>
+        // --- NAV INDICATOR ---
+        const navContainer = document.getElementById('nav-container');
+        const navIndicator = document.getElementById('nav-indicator');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function moveIndicator(element) {
+            const rect = element.getBoundingClientRect();
+            const parentRect = navContainer.getBoundingClientRect();
+            navIndicator.style.width = `${rect.width}px`;
+            navIndicator.style.left = `${rect.left - parentRect.left + 4}px`;
+        }
+
+        const activeLink = document.querySelector('.nav-link.active');
+        if (activeLink) moveIndicator(activeLink);
+
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', (e) => moveIndicator(e.target));
+            link.addEventListener('mouseleave', () => {
+                const currentActive = document.querySelector('.nav-link.active');
+                if (currentActive) moveIndicator(currentActive);
+            });
+        });
+
+        function showSuccess() {
+            document.getElementById('success-msg').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // --- THREE.JS BACKGROUND ---
+        let scene, camera, renderer, particles, coreMesh;
+        let mouseX = 0, mouseY = 0;
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('bg-canvas'),
+                alpha: true, antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const geometry = new THREE.IcosahedronGeometry(2.5, 2);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15 });
+            coreMesh = new THREE.Mesh(geometry, material);
+            scene.add(coreMesh);
+
+            const pointsGeom = new THREE.BufferGeometry();
+            const posArray = new Float32Array(1200 * 3);
+            for (let i = 0; i < 3600; i++) posArray[i] = (Math.random() - 0.5) * 15;
+            pointsGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particles = new THREE.Points(pointsGeom, new THREE.PointsMaterial({ size: 0.015, color: 0x00f2ff, transparent: true, opacity: 0.2 }));
+            scene.add(particles);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (coreMesh) { coreMesh.rotation.y += 0.002; coreMesh.rotation.x += 0.001; }
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+            const cursor = document.querySelector('.cursor');
+            if (cursor) {
+                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+            }
+        });
+
+        // --- THEME LOGIC ---
+        const themeBtn = document.getElementById('theme-btn');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+
+            if (isLight) { sunIcon.classList.remove('hidden'); moonIcon.classList.add('hidden'); }
+            else { sunIcon.classList.add('hidden'); moonIcon.classList.remove('hidden'); }
+
+            const color = isLight ? 0x4f46e5 : 0x00f2ff;
+            if (coreMesh) {
+                coreMesh.material.color.setHex(color);
+                coreMesh.material.opacity = isLight ? 0.08 : 0.15;
+            }
+            if (particles) {
+                particles.material.color.setHex(color);
+                particles.material.opacity = isLight ? 0.12 : 0.2;
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        window.onload = initThree;
+    </script>
+</body>
+
+</html>

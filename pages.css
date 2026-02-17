@@ -1,0 +1,579 @@
+/* Additional styles for other pages */
+
+.content-section {
+    padding: 4rem 0 6rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.info-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 2rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
+}
+
+.info-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.info-card p {
+    color: var(--text-gray);
+    line-height: 1.7;
+    margin-bottom: 0.8rem;
+}
+
+.info-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-card ul li {
+    color: var(--text-gray);
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.info-card ul li::before {
+    content: '⚡';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+}
+
+.rules-section,
+.form-section {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+    margin-bottom: 3rem;
+}
+
+.rules-section h2,
+.form-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+}
+
+.rules-section ol {
+    color: var(--text-gray);
+    line-height: 1.8;
+    padding-left: 2rem;
+}
+
+.rules-section ol li {
+    margin-bottom: 1rem;
+}
+
+/* Team Page */
+.team-section {
+    padding: 4rem 0 6rem;
+}
+
+.team-category {
+    margin-bottom: 5rem;
+}
+
+.team-category h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.team-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(0, 246, 255, 0.3);
+}
+
+.team-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0, 246, 255, 0.2), rgba(255, 0, 110, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    margin: 0 auto 1.5rem;
+    border: 3px solid var(--primary);
+}
+
+.team-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.team-role {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.team-social {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+}
+
+.team-social a {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 246, 255, 0.1);
+    border: 1px solid rgba(0, 246, 255, 0.3);
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.team-social a:hover {
+    background: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(0, 246, 255, 0.4);
+}
+
+/* Sponsors Page */
+.sponsors-content {
+    padding: 4rem 0 6rem;
+}
+
+.sponsor-tier {
+    margin-bottom: 5rem;
+}
+
+.sponsor-tier h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sponsor-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.sponsor-grid.title {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.sponsor-grid.gold {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.sponsor-grid.silver {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.sponsor-grid.associate {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.sponsor-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    transition: all 0.3s ease;
+}
+
+.sponsor-card.large {
+    min-height: 200px;
+}
+
+.sponsor-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(0, 246, 255, 0.3);
+}
+
+.sponsor-logo-placeholder {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-gray);
+}
+
+.sponsor-card.large .sponsor-logo-placeholder {
+    font-size: 3rem;
+}
+
+.become-sponsor {
+    background: linear-gradient(135deg, rgba(0, 246, 255, 0.1), rgba(255, 0, 110, 0.1));
+    border: 1px solid rgba(0, 246, 255, 0.3);
+    padding: 4rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.become-sponsor h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+}
+
+.become-sponsor > p {
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    line-height: 1.8;
+}
+
+.sponsor-benefits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.benefit-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+.benefit-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.benefit-card p {
+    color: var(--text-gray);
+}
+
+/* About Page */
+.about-content-grid {
+    display: grid;
+    gap: 3rem;
+    margin-bottom: 4rem;
+}
+
+.about-text h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+}
+
+.about-text p {
+    color: var(--text-gray);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+}
+
+.vision-mission {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 5rem;
+}
+
+.vm-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+}
+
+.vm-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+}
+
+.vm-card p {
+    color: var(--text-gray);
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+.timeline-section {
+    margin-bottom: 5rem;
+}
+
+.timeline-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-left: 3rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary), var(--secondary));
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+    padding-left: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -3.5rem;
+    top: 0;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid var(--bg-dark);
+    box-shadow: 0 0 20px rgba(0, 246, 255, 0.6);
+}
+
+.timeline-year {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content p {
+    color: var(--text-gray);
+}
+
+.gallery-section {
+    margin-bottom: 3rem;
+}
+
+.gallery-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.gallery-item {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 4rem;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
+}
+
+.gallery-item p {
+    font-size: 1rem;
+    color: var(--text-gray);
+    margin-top: 1rem;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* Contact Page */
+.contact-section {
+    padding: 4rem 0 6rem;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+}
+
+.contact-form-wrapper {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+}
+
+.contact-form-wrapper h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.social-links.large {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.social-links.large .social-link {
+    width: 100%;
+    padding: 0.8rem;
+    justify-content: flex-start;
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.map-section {
+    margin-top: 4rem;
+}
+
+.map-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.map-placeholder {
+    border: 1px solid rgba(0, 246, 255, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .vision-mission {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rules-section,
+    .form-section {
+        padding: 2rem 1.5rem;
+    }
+    
+    .team-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .sponsor-grid.gold,
+    .sponsor-grid.silver,
+    .sponsor-grid.associate {
+        grid-template-columns: 1fr;
+    }
+    
+    .timeline {
+        padding-left: 2rem;
+    }
+    
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .become-sponsor {
+        padding: 2rem;
+    }
+    
+    .sponsor-benefits {
+        grid-template-columns: 1fr;
+    }
+}

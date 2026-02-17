@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team - Techfest 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --bg: #030305;
+            --accent: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --nav-bg: rgba(10, 10, 15, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+        }
+
+        body.light-mode {
+            --bg: #fdfdfd;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(15, 23, 42, 0.08);
+            --card-bg: #ffffff;
+            --accent: #4f46e5;
+            --btn-bg: #0f172a;
+            --btn-text: #ffffff;
+            --primary: #4f46e5;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .dynamic-text {
+            color: var(--text-main);
+            transition: color 0.5s ease;
+        }
+
+        .dynamic-dim {
+            color: var(--text-dim);
+            transition: color 0.5s ease;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-float {
+            background: var(--nav-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5),
+                0 5px 15px -5px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.4s ease, background 0.5s ease;
+        }
+
+        body.light-mode .nav-float {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 14px;
+            transition: color 0.4s ease;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-link.active {
+            color: var(--bg);
+        }
+
+        body.light-mode .nav-link.active {
+            color: #fff;
+        }
+
+        .nav-indicator {
+            position: absolute;
+            height: calc(100% - 8px);
+            top: 4px;
+            left: 4px;
+            background: var(--primary);
+            border-radius: 40px;
+            z-index: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- MEMBER CARDS --- */
+        .member-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 24px;
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            text-align: center;
+        }
+
+        .member-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        .photo-wrapper {
+            aspect-ratio: 1/1;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .member-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .member-card:hover .member-img {
+            transform: scale(1.1);
+        }
+
+        .social-link-v2 {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .social-link-v2:hover {
+            background: var(--primary);
+            color: var(--bg);
+            transform: translateY(-3px);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .section-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: inline-block;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor hidden md:block"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="grid-lines"></div>
+
+    <!-- Header -->
+    <header class="fixed top-8 left-0 w-full z-[100] px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="logo">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <span
+                        class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
+                        2.0</span>
+                </a>
+            </div>
+
+            <div class="flex items-center">
+                <div class="nav-float hidden xl:flex">
+                    <div class="nav-indicator" id="nav-indicator"></div>
+                    <div class="nav-links-container" id="nav-container">
+                        <a href="index.html" class="nav-link">Home</a>
+                        <a href="events.html" class="nav-link">Events</a>
+                        <a href="registrations.html" class="nav-link">Register</a>
+                        <a href="accommodation.html" class="nav-link">Stay</a>
+                        <a href="team.html" class="nav-link active">Team</a>
+                        <a href="sponsors.html" class="nav-link">Sponsors</a>
+                        <a href="about.html" class="nav-link">About</a>
+                        <a href="contact.html" class="nav-link">Contact</a>
+                    </div>
+                </div>
+
+                <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
+                    <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+
+            <a href="registrations.html"
+                class="hidden md:block bg-white text-black text-[10px] uppercase font-black px-8 py-3.5 rounded-full hover:bg-cyan-400 transition-all">Join
+                Us</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-48 pb-20 relative overflow-hidden">
+        <div class="container max-w-7xl mx-auto px-6 text-center">
+            <div class="reveal active">
+                <span
+                    class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Architects
+                    of Innovation</span>
+                <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Meet The
+                    <br><span class="text-primary italic">Team</span>
+                </h1>
+                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">The brilliant minds working
+                    behind the scenes to deliver a world-class technical experience.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Content -->
+    <section class="pb-40 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Core Committee -->
+            <div class="mb-32">
+                <div class="text-center mb-16 reveal active">
+                    <span class="section-tag">Leadership</span>
+                    <h2 class="text-3xl font-black dynamic-text mt-2">Core Committee</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Rohit -->
+                    <div class="member-card reveal active">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Rohit.JPG"
+                                alt="Rohit Kakad" class="member-img">
+                        </div>
+                        <h3 class="text-xl font-black dynamic-text mb-1">Rohit Kakad</h3>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Chairperson</p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">💼</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                    <!-- Sumedha -->
+                    <div class="member-card reveal active" style="transition-delay: 0.1s;">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sumedha.PNG"
+                                alt="Sumedha Godke" class="member-img">
+                        </div>
+                        <h3 class="text-xl font-black dynamic-text mb-1">Sumedha Godke</h3>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Vice president</p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">💼</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                    <!-- Gagan -->
+                    <div class="member-card reveal active" style="transition-delay: 0.2s;">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Gagan%20Gaware.PNG"
+                                alt="Gagan Gaware" class="member-img">
+                        </div>
+                        <h3 class="text-xl font-black dynamic-text mb-1">Gagan Gaware</h3>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Secretary</p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">💼</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                    <!-- Utkarsh -->
+                    <div class="member-card reveal active" style="transition-delay: 0.3s;">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Utkarsh.JPG"
+                                alt="Utkarsh Patil" class="member-img">
+                        </div>
+                        <h3 class="text-xl font-black dynamic-text mb-1">Utkarsh Patil</h3>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Treasurer</p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">💼</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coordinators -->
+            <div class="mb-32">
+                <div class="text-center mb-16 reveal active">
+                    <span class="section-tag">Management</span>
+                    <h2 class="text-3xl font-black dynamic-text mt-2">Event Coordinators</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Shubham -->
+                    <div class="member-card reveal active">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Shubham%20Pete%20.PNG"
+                                alt="Shubham Pete" class="member-img">
+                        </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Shubham Pete</h3>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member/p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">📘</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                    <!-- Simran -->
+                    <div class="member-card reveal active" style="transition-delay: 0.1s;">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/simran.JPG"
+                                alt="Simran Khokale" class="member-img">
+                        </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Simran Khokale</h3>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member
+                        </p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">📘</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                    <!-- Tushar -->
+                    <div class="member-card reveal active" style="transition-delay: 0.2s;">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Tushar.JPG"
+                                alt="Tushar Shinde" class="member-img">
+                        </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Tushar Shinde</h3>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member
+                        </p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">📘</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                    <!-- Vrushali -->
+                    <div class="member-card reveal active" style="transition-delay: 0.3s;">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Vrushali.PNG"
+                                alt="Vrushali Dube" class="member-img">
+                        </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Vrushali Dube</h3>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member
+                        </p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">📘</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical & Media -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Tech Team -->
+                <div>
+                    <div class="mb-12 reveal active">
+                        <span class="section-tag">Infrastructure</span>
+                        <h2 class="text-2xl font-black dynamic-text mt-2">Technical Team</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="member-card reveal active">
+                            <div class="photo-wrapper h-48">
+                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sai.JPG"
+                                    alt="Sai Deokar" class="member-img">
+                            </div>
+                            <h3 class="text-lg font-black dynamic-text mb-1">Sai Deokar</h3>
+                            <p class="text-[9px] dynamic-dim uppercase tracking-widest">Executive Member</p>
+                        </div>
+                        <div class="member-card reveal active" style="transition-delay: 0.1s;">
+                            <div class="photo-wrapper h-48">
+                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Renuka.JPG"
+                                    alt="Renuka Karle" class="member-img">
+                            </div>
+                            <h3 class="text-lg font-black dynamic-text mb-1">Renuka Karle</h3>
+                            <p class="text-[9px] dynamic-dim uppercase tracking-widest">Executive Member</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Media -->
+                <div>
+                    <div class="mb-12 reveal active">
+                        <span class="section-tag">Publicity</span>
+                        <h2 class="text-2xl font-black dynamic-text mt-2">Media & PR</h2>
+                    </div>
+                    <div class="member-card reveal active max-w-sm">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Viresh%20.JPG"
+                                alt="Viresh Nagthane" class="member-img">
+                        </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Viresh Nagthane</h3>
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-6">Social Media Manager</p>
+                        <div class="flex justify-center gap-3">
+                            <a href="#" class="social-link-v2">📸</a>
+                            <a href="#" class="social-link-v2">📧</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 border-t border-white/5 text-center relative z-20">
+        <p class="text-[9px] uppercase tracking-[0.8em] dynamic-dim opacity-30">
+            &copy; 2026 Techfest 2.0 | ISTE TEAM
+        </p>
+    </footer>
+
+    <script>
+        // --- NAV INDICATOR ---
+        const navContainer = document.getElementById('nav-container');
+        const navIndicator = document.getElementById('nav-indicator');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function moveIndicator(element) {
+            const rect = element.getBoundingClientRect();
+            const parentRect = navContainer.getBoundingClientRect();
+            navIndicator.style.width = `${rect.width}px`;
+            navIndicator.style.left = `${rect.left - parentRect.left + 4}px`;
+        }
+
+        const activeLink = document.querySelector('.nav-link.active');
+        if (activeLink) moveIndicator(activeLink);
+
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', (e) => moveIndicator(e.target));
+            link.addEventListener('mouseleave', () => {
+                const currentActive = document.querySelector('.nav-link.active');
+                if (currentActive) moveIndicator(currentActive);
+            });
+        });
+
+        // --- THREE.JS BACKGROUND ---
+        let scene, camera, renderer, particles, coreMesh;
+        let mouseX = 0, mouseY = 0;
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('bg-canvas'),
+                alpha: true, antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const geometry = new THREE.IcosahedronGeometry(2.5, 2);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15 });
+            coreMesh = new THREE.Mesh(geometry, material);
+            scene.add(coreMesh);
+
+            const pointsGeom = new THREE.BufferGeometry();
+            const posArray = new Float32Array(1200 * 3);
+            for (let i = 0; i < 3600; i++) posArray[i] = (Math.random() - 0.5) * 15;
+            pointsGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particles = new THREE.Points(pointsGeom, new THREE.PointsMaterial({ size: 0.015, color: 0x00f2ff, transparent: true, opacity: 0.2 }));
+            scene.add(particles);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (coreMesh) { coreMesh.rotation.y += 0.002; coreMesh.rotation.x += 0.001; }
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            // Guard against undefined objects if resize fires before initThree
+            if (!camera || !renderer) return;
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+            const cursor = document.querySelector('.cursor');
+            if (cursor) {
+                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+            }
+        });
+
+        // --- THEME LOGIC ---
+        const themeBtn = document.getElementById('theme-btn');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+
+            if (isLight) { sunIcon.classList.remove('hidden'); moonIcon.classList.add('hidden'); }
+            else { sunIcon.classList.add('hidden'); moonIcon.classList.remove('hidden'); }
+
+            const color = isLight ? 0x4f46e5 : 0x00f2ff;
+            if (coreMesh) {
+                coreMesh.material.color.setHex(color);
+                coreMesh.material.opacity = isLight ? 0.08 : 0.15;
+            }
+            if (particles) {
+                particles.material.color.setHex(color);
+                particles.material.opacity = isLight ? 0.12 : 0.2;
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        window.onload = initThree;
+    </script>
+</body>
+
+</html>

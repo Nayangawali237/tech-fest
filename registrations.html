@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Techfest 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --bg: #030305;
+            --accent: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --nav-bg: rgba(10, 10, 15, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+        }
+
+        body.light-mode {
+            --bg: #fdfdfd;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(15, 23, 42, 0.08);
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --btn-bg: #0f172a;
+            --btn-text: #ffffff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            transition: background-color 0.6s ease, color 0.6s ease;
+            overflow-x: hidden;
+        }
+
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+        }
+
+        .nav-float {
+            background: var(--nav-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+        }
+
+        .nav-link {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 14px;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        input,
+        select {
+            background: rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text-main) !important;
+            transition: all 0.3s ease;
+        }
+
+        .light-mode input,
+        .light-mode select {
+            background: rgba(255, 255, 255, 0.8) !important;
+            color: #000 !important;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary) !important;
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+        }
+
+        /* File Upload Custom Styling */
+        input[type="file"]::file-selector-button {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+
+        .btn-primary:not(:disabled):hover {
+            transform: scale(1.02);
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .member-row {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #status-msg {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed var(--primary);
+        }
+
+        .light-mode .payment-box {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: #4f46e5;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <canvas id="bg-canvas"></canvas>
+    <div class="grid-lines"></div>
+
+    <header class="fixed top-6 left-0 w-full z-[100] px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-tech font-black text-lg tracking-tighter uppercase">Techfest 2.0</a>
+            <div class="flex items-center gap-4">
+                <nav class="nav-float hidden md:flex items-center px-4">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="events.html" class="nav-link">Events</a>
+                    <a href="registrations.html" class="nav-link active">Register</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </nav>
+                <button class="theme-toggle" id="theme-btn">
+                    <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path id="theme-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-32 pb-20 px-6">
+        <div class="max-w-2xl mx-auto">
+            <div class="text-center mb-12">
+                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Step Into The Future</span>
+                <h1 class="text-5xl font-black mt-4 font-tech tracking-tight">Event Registration</h1>
+            </div>
+
+            <div class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl">
+                <form id="regForm" class="space-y-8" enctype="multipart/form-data">
+                    <!-- Event Selection -->
+                    <div>
+                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Target
+                            Event</label>
+                        <select name="event_name" id="event_name" required class="w-full rounded-xl px-5 py-4">
+                            <option value="" disabled selected>Select an event...</option>
+                            <option value="expo" data-title="Project Expo" data-type="team" data-max="4">Project Expo
+                                (₹199/person)</option>
+                            <option value="cad" data-title="CAD Competition" data-type="solo" data-max="1">CAD
+                                Competition (₹199)</option>
+                            <option value="code" data-title="Code Competition" data-type="solo" data-max="1">Code
+                                Competition (₹199)</option>
+                            <option value="robo" data-title="Robo Race" data-type="team" data-max="4">Robo Race
+                                (₹199/person)</option>
+                            <option value="poster" data-title="Poster Competition" data-type="team" data-max="4">Poster
+                                Competition (₹199/person)</option>
+                            <option value="startup" data-title="Startup Pitch" data-type="team" data-max="4">Startup
+                                Pitch (₹199/person)</option>
+                            <option value="tower" data-title="Tower Challenge" data-type="team" data-max="4">Tower
+                                Challenge (₹199/person)</option>
+                        </select>
+                    </div>
+
+                    <!-- Team Details -->
+                    <div id="team_info_group" class="hidden space-y-6">
+                        <div>
+                            <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Team
+                                Name</label>
+                            <input type="text" name="team_name" id="team_name" placeholder="Enter team name"
+                                class="w-full rounded-xl px-5 py-4">
+                        </div>
+
+                        <div id="members_container" class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <label
+                                    class="block text-[10px] uppercase font-black tracking-widest text-primary">Additional
+                                    Team Members</label>
+                                <button type="button" id="add_member_btn"
+                                    class="text-[9px] font-black bg-primary/10 text-primary border border-primary/20 px-4 py-2 rounded-full hover:bg-primary hover:text-black transition-all">
+                                    + Add Member
+                                </button>
+                            </div>
+                            <div id="members_list" class="space-y-3">
+                                <!-- Dynamic members injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lead Representative -->
+                    <div class="pt-6 border-t border-white/10">
+                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-6">Lead
+                            Participant Details</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <input type="text" name="lead_name" placeholder="Full Name" required
+                                class="w-full rounded-xl px-5 py-4">
+                            <input type="tel" name="lead_phone" placeholder="WhatsApp Number" required
+                                class="w-full rounded-xl px-5 py-4">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <input type="email" name="lead_email" placeholder="Email Address" required
+                                class="w-full rounded-xl px-5 py-4">
+                            <input type="text" name="college" placeholder="College/Institution" required
+                                class="w-full rounded-xl px-5 py-4">
+                        </div>
+                    </div>
+
+                    <!-- Fee Summary & Payment -->
+                    <div class="space-y-6 pt-6 border-t border-white/10">
+                        <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col gap-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] uppercase font-bold opacity-60">Registration Fee</span>
+                                <span id="fee_calc_label" class="text-sm font-bold">₹199 × 1</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] uppercase font-bold opacity-60">Participant Count</span>
+                                <span id="participant_count" class="text-sm font-bold">1</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2 pt-2 border-t border-primary/10">
+                                <span class="text-[10px] uppercase font-black text-primary tracking-widest">Total
+                                    Payable</span>
+                                <span id="amount_display" class="text-3xl font-black font-tech text-primary">₹199</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment QR Section -->
+                        <div class="payment-box rounded-2xl p-6 text-center space-y-4">
+                            <h3 class="text-xs uppercase font-black tracking-widest text-primary">Scan to Pay</h3>
+                            <div
+                                class="bg-white p-4 rounded-xl inline-block mx-auto shadow-lg relative overflow-hidden group">
+                                <img id="payment_qr_img"
+                                    src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/199.jpeg"
+                                    alt="Payment QR Code"
+                                    class="w-48 h-48 object-contain transition-opacity duration-300"
+                                    onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9172743746@ptaxis&pn=NAYANGAVLI&am=199';">
+                                <div id="qr_loading"
+                                    class="absolute inset-0 bg-white/80 flex items-center justify-center opacity-0 pointer-events-none transition-opacity">
+                                    <div
+                                        class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[11px] font-bold opacity-80 uppercase">UPI ID: <span
+                                        class="text-primary select-all">9172743746@ptaxis</span></p>
+                                <p class="text-[9px] text-dim italic">Scan using BHIM, Google Pay, PhonePe, or Paytm</p>
+                            </div>
+                        </div>
+
+                        <!-- Verification Fields -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Transaction
+                                    ID / UTR</label>
+                                <input type="text" name="transaction_id" id="transaction_id" placeholder="12-digit ID"
+                                    required class="w-full rounded-xl px-5 py-4 font-mono text-sm">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Payment
+                                    Screenshot</label>
+                                <div class="relative">
+                                    <input type="file" name="payment_screenshot" id="payment_screenshot"
+                                        accept="image/*" required
+                                        class="w-full rounded-xl px-4 py-[13px] text-xs cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-[9px] opacity-50 text-center">Incorrect IDs or blurry screenshots will lead to
+                            immediate registration rejection.</p>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-primary w-full py-5 rounded-2xl text-sm">
+                        Verify & Complete Registration
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div id="status-msg"></div>
+
+    <script>
+        // --- THREE.JS BACKGROUND ---
+        let scene, camera, renderer, coreMesh;
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const geometry = new THREE.IcosahedronGeometry(2, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
+            coreMesh = new THREE.Mesh(geometry, material);
+            scene.add(coreMesh);
+            animate();
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            coreMesh.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+
+        // --- DYNAMIC LOGIC ---
+        const eventSelect = document.getElementById('event_name');
+        const teamInfoGroup = document.getElementById('team_info_group');
+        const membersList = document.getElementById('members_list');
+        const addMemberBtn = document.getElementById('add_member_btn');
+        const amountDisplay = document.getElementById('amount_display');
+        const countDisplay = document.getElementById('participant_count');
+        const feeCalcLabel = document.getElementById('fee_calc_label');
+        const regForm = document.getElementById('regForm');
+        const statusMsg = document.getElementById('status-msg');
+        const submitBtn = document.getElementById('submitBtn');
+        const paymentQrImg = document.getElementById('payment_qr_img');
+        const qrLoading = document.getElementById('qr_loading');
+
+        let maxMembers = 1;
+
+        // Configuration for Prices and QR Images
+        const PRICING_MAP = {
+            1: { price: 199, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/199.jpeg" },
+            2: { price: 399, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/399.jpeg" },
+            3: { price: 599, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/599.jpeg" },
+            4: { price: 799, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" }
+        };
+
+        function updatePrice() {
+            const memberCount = membersList.children.length + 1; // +1 for lead
+            countDisplay.innerText = memberCount;
+
+            const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
+
+            // Update labels
+            feeCalcLabel.innerText = `₹199 × ${memberCount}${memberCount > 1 ? ' (incl. group disc.)' : ''}`;
+            amountDisplay.innerText = `₹${pricing.price}`;
+
+            // Update QR Code Image with loading effect
+            if (paymentQrImg.src !== pricing.qr) {
+                qrLoading.style.opacity = "1";
+                paymentQrImg.style.opacity = "0.3";
+
+                const newImg = new Image();
+                newImg.onload = () => {
+                    paymentQrImg.src = pricing.qr;
+                    paymentQrImg.style.opacity = "1";
+                    qrLoading.style.opacity = "0";
+                };
+                newImg.src = pricing.qr;
+            }
+
+            addMemberBtn.style.display = memberCount >= maxMembers ? 'none' : 'block';
+        }
+
+        function addMemberField() {
+            if (membersList.children.length + 1 >= maxMembers) return;
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 member-row';
+            div.innerHTML = `
+                <input type="text" name="member_names[]" placeholder="Member Full Name" required 
+                       class="flex-1 rounded-xl px-5 py-3 text-sm">
+                <button type="button" class="remove-member p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+            div.querySelector('.remove-member').onclick = () => { div.remove(); updatePrice(); };
+            membersList.appendChild(div);
+            updatePrice();
+        }
+
+        eventSelect.addEventListener('change', () => {
+            const selected = eventSelect.options[eventSelect.selectedIndex];
+            const type = selected.getAttribute('data-type');
+            maxMembers = parseInt(selected.getAttribute('data-max'));
+            if (type === 'team') {
+                teamInfoGroup.classList.remove('hidden');
+                document.getElementById('team_name').required = true;
+            } else {
+                teamInfoGroup.classList.add('hidden');
+                document.getElementById('team_name').required = false;
+                membersList.innerHTML = '';
+            }
+            updatePrice();
+        });
+
+        addMemberBtn.addEventListener('click', addMemberField);
+
+        // --- FORM SUBMISSION ---
+        regForm.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const utr = document.getElementById('transaction_id').value.trim();
+            const screenshot = document.getElementById('payment_screenshot').files[0];
+
+            if (utr.length < 8) {
+                showMsg("Please enter a valid Transaction ID / UTR", "error");
+                return;
+            }
+
+            if (!screenshot) {
+                showMsg("Please upload your payment screenshot", "error");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Uploading Details...";
+
+            const formData = new FormData(regForm);
+
+            try {
+                const response = await fetch('registrations.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMsg("Registration Submitted! Verification in progress.", "success");
+                    regForm.reset();
+                    membersList.innerHTML = '';
+                    updatePrice();
+                } else {
+                    showMsg("Error: " + result.message, "error");
+                }
+            } catch (error) {
+                showMsg("Submission Error. Check server connectivity.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Verify & Complete Registration";
+            }
+        };
+
+        function showMsg(text, type) {
+            statusMsg.innerText = text;
+            statusMsg.style.background = type === 'success' ? "rgba(16, 185, 129, 0.9)" : "rgba(239, 68, 68, 0.9)";
+            statusMsg.style.display = 'block';
+            setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
+        }
+
+        window.onload = () => {
+            initThree();
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('event');
+            if (eventId) {
+                eventSelect.value = eventId;
+                eventSelect.dispatchEvent(new Event('change'));
+            }
+        };
+
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            coreMesh.material.color.setHex(isLight ? 0x4f46e5 : 0x00f2ff);
+            document.getElementById('theme-path').setAttribute('d', isLight ?
+                "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" :
+                "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z");
+        });
+
+        // Resize handler for Three.js
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+
+</html>

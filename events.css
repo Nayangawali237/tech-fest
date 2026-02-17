@@ -1,0 +1,106 @@
+.page-header {
+    padding: 10rem 0 4rem;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(0, 246, 255, 0.05), rgba(255, 0, 110, 0.05));
+    border-bottom: 1px solid rgba(0, 246, 255, 0.2);
+}
+
+.page-header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-header p {
+    font-size: 1.2rem;
+    color: var(--text-gray);
+}
+
+.events-section {
+    padding: 4rem 0 6rem;
+}
+
+.tabs-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+}
+
+.tab {
+    background: var(--bg-card);
+    border: 2px solid rgba(0, 246, 255, 0.2);
+    color: var(--text-gray);
+    padding: 1rem 2.5rem;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.tab.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-color: var(--primary);
+    color: var(--bg-dark);
+    box-shadow: 0 0 30px rgba(0, 246, 255, 0.4);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event-badge.technical {
+    background: rgba(0, 246, 255, 0.1);
+    color: var(--primary);
+}
+
+.event-badge.creative {
+    background: rgba(255, 0, 110, 0.1);
+    color: var(--secondary);
+}
+
+.event-badge.entrepreneurship {
+    background: rgba(255, 190, 11, 0.1);
+    color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .tabs-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .tab {
+        text-align: center;
+    }
+}

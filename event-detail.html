@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details - Techfest 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2ff;
+            --bg: #030305;
+            --accent: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --nav-bg: rgba(10, 10, 15, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+        }
+
+        body.light-mode {
+            --bg: #fdfdfd;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(15, 23, 42, 0.08);
+            --card-bg: #ffffff;
+            --accent: #4f46e5;
+            --btn-bg: #0f172a;
+            --btn-text: #ffffff;
+            --primary: #4f46e5;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .dynamic-text {
+            color: var(--text-main);
+            transition: color 0.5s ease;
+        }
+
+        .dynamic-dim {
+            color: var(--text-dim);
+            transition: color 0.5s ease;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -1;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .nav-float {
+            background: var(--nav-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 14px;
+            transition: color 0.4s ease;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-link.active {
+            color: var(--bg);
+        }
+
+        body.light-mode .nav-link.active {
+            color: #fff;
+        }
+
+        .nav-indicator {
+            position: absolute;
+            height: calc(100% - 8px);
+            top: 4px;
+            background: var(--primary);
+            border-radius: 40px;
+            z-index: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .glass-card-v2 {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 32px;
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .event-menu-item {
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .event-menu-item.active {
+            background: var(--primary);
+            color: var(--bg);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px -5px rgba(0, 242, 255, 0.3);
+        }
+
+        .stat-box-v2 {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-register-v2 {
+            background: var(--primary);
+            color: var(--bg);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            padding: 20px 40px;
+            border-radius: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 15px 30px -10px rgba(0, 242, 255, 0.4);
+            cursor: pointer;
+        }
+
+        .btn-register-v2:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor hidden md:block"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="grid-lines"></div>
+
+    <header class="fixed top-8 left-0 w-full z-[100] px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="logo">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <span
+                        class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
+                        2.0</span>
+                </a>
+            </div>
+
+            <div class="flex items-center">
+                <div class="nav-float hidden xl:flex">
+                    <div class="nav-indicator" id="nav-indicator"></div>
+                    <div class="nav-links-container" id="nav-container">
+                        <a href="index.html" class="nav-link">Home</a>
+                        <a href="events.html" class="nav-link active">Events</a>
+                        <a href="registrations.html" class="nav-link">Register</a>
+                        <a href="contact.html" class="nav-link">Contact</a>
+                    </div>
+                </div>
+
+                <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
+                    <svg id="sun-icon" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <svg id="moon-icon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="pt-48 pb-12 px-6">
+        <div class="max-w-7xl mx-auto text-center reveal active">
+            <span id="event-badge"
+                class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Event</span>
+            <h1 id="event-title"
+                class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-4">Project <span
+                    class="text-primary italic">Expo</span></h1>
+            <p id="event-tagline" class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed"></p>
+        </div>
+    </section>
+
+    <section class="pb-40 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-4 reveal active">
+                <div class="glass-card-v2">
+                    <h3 class="text-[10px] font-black text-primary uppercase tracking-[0.4em] mb-8">Event Catalog</h3>
+                    <div id="event-selector" class="space-y-1"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 reveal active" style="transition-delay: 0.1s;">
+                <div id="details-panel" class="glass-card-v2 space-y-12">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="stat-box-v2">
+                            <span class="text-[9px] uppercase font-bold dynamic-dim tracking-widest block mb-2">Total
+                                Prize Pool</span>
+                            <span id="stat-prize" class="text-2xl font-black text-primary">₹90,000</span>
+                        </div>
+                        <div class="stat-box-v2">
+                            <span class="text-[9px] uppercase font-bold dynamic-dim tracking-widest block mb-2">Entry
+                                Fee (Per Person)</span>
+                            <span id="stat-entry" class="text-2xl font-black dynamic-text">₹199</span>
+                        </div>
+                        <div class="stat-box-v2">
+                            <span
+                                class="text-[9px] uppercase font-bold dynamic-dim tracking-widest block mb-2">Participation
+                                Type</span>
+                            <span id="stat-team" class="text-2xl font-black dynamic-text">Group</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-black dynamic-text mb-6 uppercase tracking-tight">Prize Distribution
+                        </h2>
+                        <div id="prize-breakdown" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                            <!-- Populated by JS -->
+                        </div>
+                        <h2 class="text-2xl font-black dynamic-text mb-6 uppercase tracking-tight">Description</h2>
+                        <p id="event-desc" class="dynamic-dim text-lg leading-loose font-light"></p>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-black dynamic-text mb-6 uppercase tracking-tight">Rules & Guidelines
+                        </h2>
+                        <div id="rules-list" class="space-y-4"></div>
+                    </div>
+
+                    <div class="pt-8 border-t border-white/5">
+                        <a id="main-reg-btn" href="registrations.html" class="btn-register-v2">Register Now (₹199)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-20 border-t border-white/5 text-center relative z-20">
+        <p class="text-[9px] uppercase tracking-[0.8em] dynamic-dim opacity-30">&copy; 2026 Techfest 2.0 | ISTE TEAM</p>
+    </footer>
+
+    <script>
+        const events = [
+            {
+                id: 'expo',
+                title: 'Project Expo',
+                tagline: 'The Ultimate Innovation Showcase',
+                badge: 'Flagship Event',
+                totalPrize: '₹90,000',
+                prizes: { first: '50,000', second: '30,000', third: '10,000' },
+                entry: '₹199',
+                team: 'Group',
+                desc: 'A platform to demonstrate your innovative prototypes and research projects to industry leaders and technical experts.',
+                rules: [
+                    'Maximum 4 members per team.',
+                    'Working prototype is mandatory.',
+                    'Originality and impact are key judging criteria.'
+                ]
+            },
+            {
+                id: 'cad',
+                title: 'CAD Competition',
+                tagline: 'Precision and Design Excellence',
+                badge: 'Technical Solo',
+                totalPrize: '₹10,000',
+                prizes: { first: '5,000', second: '3,000', third: '2,000' },
+                entry: '₹199',
+                team: 'Solo',
+                desc: 'Showcase your 3D modeling skills by designing complex mechanical components within a time limit.',
+                rules: [
+                    'Software provided: AutoCAD / SolidWorks.',
+                    'Time duration: 2 hours.',
+                    'Evaluation based on accuracy and speed.'
+                ]
+            },
+            {
+                id: 'code',
+                title: 'Code Competition',
+                tagline: 'The Algorithmic Battlefield',
+                badge: 'Technical Solo',
+                totalPrize: '₹10,000',
+                prizes: { first: '5,000', second: '3,000', third: '2,000' },
+                entry: '₹199',
+                team: 'Solo',
+                desc: 'Solve complex algorithmic challenges and debug code to prove your logical supremacy.',
+                rules: [
+                    'Languages allowed: C++, Python, Java.',
+                    'No external libraries or internet access.',
+                    'Points awarded based on time complexity and test cases.'
+                ]
+            },
+            {
+                id: 'robo',
+                title: 'Robo Race',
+                tagline: 'High Octane Circuit Racing',
+                badge: 'Mechanical Group',
+                totalPrize: '₹22,000',
+                prizes: { first: '10,000', second: '7,000', third: '5,000' },
+                entry: '₹199',
+                team: 'Group',
+                desc: 'Maneuver your custom-built robots through a challenging obstacle course in the shortest time possible.',
+                rules: [
+                    'Bot dimensions: Max 30x30 cm.',
+                    'Both wired and wireless bots allowed.',
+                    'Course will have specialized terrain and obstacles.'
+                ]
+            },
+            {
+                id: 'poster',
+                title: 'Poster Competition',
+                tagline: 'Visual Technical Storytelling',
+                badge: 'Creative Group',
+                totalPrize: '₹22,000',
+                prizes: { first: '10,000', second: '7,000', third: '5,000' },
+                entry: '₹199',
+                team: 'Group',
+                desc: 'Present technical concepts through compelling visual design and creative posters.',
+                rules: [
+                    'Dimensions: A1/A2 size.',
+                    'Must include a clear technical abstract.',
+                    'Digital or handmade posters are permitted.'
+                ]
+            },
+            {
+                id: 'startup',
+                title: 'Startup Pitch',
+                tagline: 'From Idea to Enterprise',
+                badge: 'Entrepreneurial Group',
+                totalPrize: '₹15,000',
+                prizes: { first: '7,000', second: '5,000', third: '3,000' },
+                entry: '₹199',
+                team: 'Group',
+                desc: 'Pitch your business idea to a panel of entrepreneurs. Focus on scalability and market fit.',
+                rules: [
+                    'Maximum 10 slides in pitch deck.',
+                    'Time limit: 5 mins pitch + 3 mins Q&A.',
+                    'Business model canvas is highly recommended.'
+                ]
+            },
+            {
+                id: 'tower',
+                title: 'Tower Challenge',
+                tagline: 'Structural Integrity Test',
+                badge: 'Engineering Group',
+                totalPrize: '₹15,000',
+                prizes: { first: '7,000', second: '5,000', third: '3,000' },
+                entry: '₹199',
+                team: 'Group',
+                desc: 'Build the tallest, most stable tower using the provided structural materials on-site.',
+                rules: [
+                    'Only provided materials may be used.',
+                    'Tower must support a specific load for 10 seconds.',
+                    'Height and efficiency are the primary metrics.'
+                ]
+            }
+        ];
+
+        function loadEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (!event) return;
+
+            const panel = document.getElementById('details-panel');
+            panel.style.opacity = '0';
+            panel.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                document.getElementById('event-badge').innerText = event.badge;
+                const words = event.title.split(' ');
+                if (words.length > 1) {
+                    document.getElementById('event-title').innerHTML = `${words[0]} <span class="text-primary italic">${words.slice(1).join(' ')}</span>`;
+                } else {
+                    document.getElementById('event-title').innerHTML = `<span class="text-primary italic">${words[0]}</span>`;
+                }
+
+                document.getElementById('event-tagline').innerText = event.tagline;
+                document.getElementById('stat-prize').innerText = event.totalPrize;
+                document.getElementById('stat-entry').innerText = event.entry;
+                document.getElementById('stat-team').innerText = event.team;
+                document.getElementById('event-desc').innerText = event.desc;
+
+                const prizeGrid = document.getElementById('prize-breakdown');
+                prizeGrid.innerHTML = `
+                    <div class="stat-box-v2 border-primary/20 bg-primary/5">
+                        <span class="text-[9px] uppercase font-bold text-primary tracking-widest block mb-1">Winner</span>
+                        <span class="text-xl font-black dynamic-text">₹${event.prizes.first}</span>
+                    </div>
+                    <div class="stat-box-v2">
+                        <span class="text-[9px] uppercase font-bold dynamic-dim tracking-widest block mb-1">Runner Up</span>
+                        <span class="text-xl font-black dynamic-text">₹${event.prizes.second}</span>
+                    </div>
+                    <div class="stat-box-v2">
+                        <span class="text-[9px] uppercase font-bold dynamic-dim tracking-widest block mb-1">2nd Runner Up</span>
+                        <span class="text-xl font-black dynamic-text">₹${event.prizes.third}</span>
+                    </div>
+                `;
+
+                const rulesList = document.getElementById('rules-list');
+                rulesList.innerHTML = '';
+                event.rules.forEach(rule => {
+                    const div = document.createElement('div');
+                    div.className = 'flex gap-3 items-start';
+                    div.innerHTML = `<span class="text-primary mt-1">⚡</span><p class="dynamic-dim text-base font-light">${rule}</p>`;
+                    rulesList.appendChild(div);
+                });
+
+                // Update Registration Button link to include the specific event ID
+                const regBtn = document.getElementById('main-reg-btn');
+                regBtn.href = `registrations.html?event=${event.id}`;
+                regBtn.innerText = `Register for ${event.title} (${event.entry})`;
+
+                document.querySelectorAll('.event-menu-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.id === id) item.classList.add('active');
+                });
+
+                panel.style.opacity = '1';
+                panel.style.transform = 'translateY(0)';
+            }, 200);
+        }
+
+        function init() {
+            const menu = document.getElementById('event-selector');
+            events.forEach((event, index) => {
+                const div = document.createElement('div');
+                div.className = `event-menu-item ${index === 0 ? 'active' : ''}`;
+                div.innerHTML = `<span>${event.title}</span> <span class="opacity-30">›</span>`;
+                div.dataset.id = event.id;
+                div.onclick = () => loadEvent(event.id);
+                menu.appendChild(div);
+            });
+            loadEvent(events[0].id);
+            initThree();
+        }
+
+        // Three.js Background
+        let scene, camera, renderer, coreMesh;
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const geometry = new THREE.IcosahedronGeometry(2.5, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
+            coreMesh = new THREE.Mesh(geometry, material);
+            scene.add(coreMesh);
+            animate();
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            coreMesh.rotation.y += 0.002;
+            renderer.render(scene, camera);
+        }
+
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            coreMesh.material.color.setHex(isLight ? 0x4f46e5 : 0x00f2ff);
+            document.getElementById('sun-icon').classList.toggle('hidden');
+            document.getElementById('moon-icon').classList.toggle('hidden');
+        });
+
+        const navContainer = document.getElementById('nav-container');
+        const navIndicator = document.getElementById('nav-indicator');
+        function moveIndicator(element) {
+            const rect = element.getBoundingClientRect();
+            const parentRect = navContainer.getBoundingClientRect();
+            navIndicator.style.width = `${rect.width}px`;
+            navIndicator.style.left = `${rect.left - parentRect.left + 4}px`;
+        }
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.classList.contains('active')) moveIndicator(link);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.querySelector('.cursor');
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>
