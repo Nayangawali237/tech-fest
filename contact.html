@@ -49,25 +49,13 @@
             transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        .font-tech {
+        h1, h2, h3, h4, h5, .font-tech {
             font-family: 'Orbitron', sans-serif;
             letter-spacing: -0.02em;
         }
 
-        .dynamic-text {
-            color: var(--text-main);
-            transition: color 0.5s ease;
-        }
-
-        .dynamic-dim {
-            color: var(--text-dim);
-            transition: color 0.5s ease;
-        }
+        .dynamic-text { color: var(--text-main); transition: color 0.5s ease; }
+        .dynamic-dim { color: var(--text-dim); transition: color 0.5s ease; }
 
         #bg-canvas {
             position: fixed;
@@ -100,13 +88,8 @@
             position: relative;
             display: flex;
             align-items: center;
-            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5),
-                0 5px 15px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5);
             transition: box-shadow 0.4s ease, background 0.5s ease;
-        }
-
-        body.light-mode .nav-float {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
         }
 
         .nav-link {
@@ -120,15 +103,11 @@
             transition: color 0.4s ease;
             position: relative;
             white-space: nowrap;
+            z-index: 1;
         }
 
-        .nav-link.active {
-            color: var(--bg);
-        }
-
-        body.light-mode .nav-link.active {
-            color: #fff;
-        }
+        .nav-link.active { color: var(--bg); }
+        body.light-mode .nav-link.active { color: #fff; }
 
         .nav-indicator {
             position: absolute;
@@ -154,8 +133,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-left: 1rem;
-            position: relative;
-            overflow: hidden;
         }
 
         /* --- CARDS & FORMS --- */
@@ -206,11 +183,7 @@
             cursor: pointer;
         }
 
-        .btn-primary-v2:hover {
-            transform: translateY(-3px);
-            filter: brightness(1.1);
-            box-shadow: 0 15px 30px -5px rgba(0, 242, 255, 0.4);
-        }
+        .btn-primary-v2:disabled { opacity: 0.6; cursor: wait; }
 
         .info-item-v2 {
             padding: 24px;
@@ -220,21 +193,13 @@
             transition: all 0.3s ease;
         }
 
-        .info-item-v2:hover {
-            background: rgba(0, 242, 255, 0.03);
-            border-color: var(--primary);
-        }
-
         .reveal {
             opacity: 0;
             transform: translateY(30px);
             transition: all 1s cubic-bezier(0.2, 1, 0.3, 1);
         }
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
         .cursor {
             width: 20px;
@@ -248,17 +213,11 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Map styling */
         .map-wrapper {
             border-radius: 24px;
             overflow: hidden;
             border: 1px solid var(--border);
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
-            transition: border-color 0.4s ease;
-        }
-
-        .map-wrapper:hover {
-            border-color: var(--primary);
         }
 
         .map-iframe {
@@ -266,9 +225,7 @@
             transition: filter 0.5s ease;
         }
 
-        body.light-mode .map-iframe {
-            filter: grayscale(0.5) contrast(1);
-        }
+        body.light-mode .map-iframe { filter: grayscale(0.5) contrast(1); }
     </style>
 </head>
 
@@ -280,172 +237,110 @@
     <!-- Header -->
     <header class="fixed top-8 left-0 w-full z-[100] px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="logo">
-                <a href="index.html" class="flex items-center gap-2 group">
-                    <span
-                        class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
-                        2.0</span>
-                </a>
-            </div>
+            <a href="index.html" class="flex items-center gap-2 group">
+                <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
+            </a>
 
             <div class="flex items-center">
                 <div class="nav-float hidden xl:flex">
                     <div class="nav-indicator" id="nav-indicator"></div>
-                    <div class="nav-links-container" id="nav-container">
+                    <div class="nav-links-container flex" id="nav-container">
                         <a href="index.html" class="nav-link">Home</a>
                         <a href="events.html" class="nav-link">Events</a>
                         <a href="registrations.html" class="nav-link">Register</a>
                         <a href="accommodation.html" class="nav-link">Stay</a>
-                        <a href="team.html" class="nav-link">Team</a>
-                        <a href="sponsors.html" class="nav-link">Sponsors</a>
-                        <a href="about.html" class="nav-link">About</a>
                         <a href="contact.html" class="nav-link active">Contact</a>
                     </div>
                 </div>
 
                 <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
-                    <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path id="theme-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
             </div>
-
-            <a href="registrations.html"
-                class="hidden md:block bg-white text-black text-[10px] uppercase font-black px-8 py-3.5 rounded-full hover:bg-cyan-400 transition-all">Support</a>
         </div>
     </header>
 
     <!-- Page Title -->
-    <section class="pt-48 pb-20 relative overflow-hidden">
-        <div class="container max-w-7xl mx-auto px-6 text-center">
+    <section class="pt-48 pb-20 relative overflow-hidden text-center">
+        <div class="container max-w-7xl mx-auto px-6">
             <div class="reveal active">
-                <span
-                    class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Get
-                    In Touch</span>
-                <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Contact
-                    <br><span class="text-primary italic">Us</span></h1>
-                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">Have questions or need
-                    assistance? Our team is here to help you navigate your Techfest journey.</p>
+                <span class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Get In Touch</span>
+                <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Contact <br><span class="text-primary italic">Us</span></h1>
+                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">Have questions or need assistance? Our team is here to help you navigate your Techfest journey.</p>
             </div>
         </div>
     </section>
 
-    <!-- Main Content Section -->
+    <!-- Main Content -->
     <section class="pb-32 px-6 relative z-10">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-            <!-- Contact Form Card -->
+            <!-- Contact Form -->
             <div class="glass-card-v2 reveal active">
                 <h2 class="text-2xl font-black dynamic-text mb-8 uppercase tracking-tight">Send a Message</h2>
-                <form onsubmit="event.preventDefault(); showSuccess();" class="space-y-6">
+                <form id="contactForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Full
-                                Name</label>
-                            <input type="text" required class="form-control" placeholder="John Doe">
+                            <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Full Name</label>
+                            <input type="text" name="name" required class="form-control" placeholder="John Doe">
                         </div>
                         <div>
-                            <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Email
-                                Address</label>
-                            <input type="email" required class="form-control" placeholder="john@example.com">
+                            <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Email Address</label>
+                            <input type="email" name="email" required class="form-control" placeholder="john@example.com">
                         </div>
                     </div>
                     <div>
-                        <label
-                            class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Subject</label>
-                        <select required class="form-control">
+                        <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Subject</label>
+                        <select name="subject" required class="form-control">
                             <option value="">Select Query Type</option>
-                            <option>Registration Issue</option>
-                            <option>Event Details</option>
-                            <option>Accommodation</option>
-                            <option>Sponsorship</option>
-                            <option>Other</option>
+                            <option value="Registration Issue">Registration Issue</option>
+                            <option value="Event Details">Event Details</option>
+                            <option value="Accommodation">Accommodation</option>
+                            <option value="Sponsorship">Sponsorship</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div>
-                        <label
-                            class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Message</label>
-                        <textarea rows="5" required class="form-control"
-                            placeholder="Tell us how we can help..."></textarea>
+                        <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Message</label>
+                        <textarea name="message" rows="5" required class="form-control" placeholder="Tell us how we can help..."></textarea>
                     </div>
-                    <button type="submit" class="btn-primary-v2">Transmit Message</button>
+                    <button type="submit" id="submitBtn" class="btn-primary-v2">Transmit Message</button>
                 </form>
-                <div id="success-msg"
-                    class="hidden mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5 text-center">
-                    <p class="text-primary text-sm font-bold">⚡ Transmission Successful. We will respond shortly.</p>
-                </div>
+                <div id="status-msg" class="hidden mt-6 p-4 rounded-xl border text-center"></div>
             </div>
 
-            <!-- Contact Information -->
+            <!-- Contact Info -->
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="info-item-v2 reveal active">
                         <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-4">📧 Email Support</h3>
                         <p class="text-sm dynamic-text font-bold mb-1">info@techfest.edu.in</p>
-                        <p class="text-xs dynamic-dim">General & Registration</p>
                     </div>
                     <div class="info-item-v2 reveal active" style="transition-delay: 0.1s;">
                         <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-4">📞 Helpline</h3>
                         <p class="text-sm dynamic-text font-bold mb-1">+91 98765 43210</p>
-                        <p class="text-xs dynamic-dim">Mon - Sat, 9AM - 6PM</p>
                     </div>
                 </div>
-
                 <div class="info-item-v2 reveal active" style="transition-delay: 0.2s;">
                     <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-4">📍 Location</h3>
-                    <p class="text-sm dynamic-text font-bold leading-relaxed">Sanjivani College of
-                        Engineering<br>Kopargaon, Ahmednagar<br>Maharashtra, India - 423603</p>
-                </div>
-
-                <div class="info-item-v2 reveal active" style="transition-delay: 0.3s;">
-                    <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-4">🌐 Digital Presence</h3>
-                    <div class="flex flex-wrap gap-4 mt-4">
-                        <a href="#"
-                            class="text-xs font-bold dynamic-dim hover:text-primary transition-colors uppercase tracking-widest">Instagram</a>
-                        <span class="opacity-20">/</span>
-                        <a href="#"
-                            class="text-xs font-bold dynamic-dim hover:text-primary transition-colors uppercase tracking-widest">LinkedIn</a>
-                        <span class="opacity-20">/</span>
-                        <a href="#"
-                            class="text-xs font-bold dynamic-dim hover:text-primary transition-colors uppercase tracking-widest">Twitter</a>
-                    </div>
+                    <p class="text-sm dynamic-text font-bold leading-relaxed">Sanjivani College of Engineering<br>Kopargaon, Maharashtra, 423603</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Map Section -->
+    <!-- Map -->
     <section class="pb-40 px-6 relative z-10">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-12 reveal active">
-                <h2 class="text-3xl font-black dynamic-text tracking-tighter">Navigate To <span
-                        class="text-primary">Innovation</span></h2>
-            </div>
             <div class="map-wrapper reveal active">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3753.947514304882!2d74.49214777595709!3d19.800543628994507!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdc606553587b13%3A0xe2a8a178e6301389!2sSanjivani%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1700000000000"
-                    width="100%" height="450" class="map-iframe" style="border:0;" allowfullscreen=""
-                    loading="lazy"></iframe>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3753.947514304882!2d74.49214777595709!3d19.800543628994507!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdc606553587b13%3A0xe2a8a178e6301389!2sSanjivani%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1700000000000" width="100%" height="450" class="map-iframe" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-20 border-t border-white/5 text-center relative z-20">
-        <p class="text-[9px] uppercase tracking-[0.8em] dynamic-dim opacity-30">
-            &copy; 2026 Techfest 2.0 | ISTE TEAM
-        </p>
-    </footer>
-
     <script>
-        // --- NAV INDICATOR ---
+        // Navigation & Three.js Logic (Standard for this site)
         const navContainer = document.getElementById('nav-container');
         const navIndicator = document.getElementById('nav-indicator');
         const navLinks = document.querySelectorAll('.nav-link');
@@ -460,103 +355,81 @@
         const activeLink = document.querySelector('.nav-link.active');
         if (activeLink) moveIndicator(activeLink);
 
-        navLinks.forEach(link => {
-            link.addEventListener('mouseenter', (e) => moveIndicator(e.target));
-            link.addEventListener('mouseleave', () => {
-                const currentActive = document.querySelector('.nav-link.active');
-                if (currentActive) moveIndicator(currentActive);
-            });
-        });
-
-        function showSuccess() {
-            document.getElementById('success-msg').classList.remove('hidden');
-        }
-
-        // --- THREE.JS BACKGROUND ---
-        let scene, camera, renderer, particles, coreMesh;
-        let mouseX = 0, mouseY = 0;
-
+        let scene, camera, renderer, coreMesh;
         function initThree() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 5;
-
-            renderer = new THREE.WebGLRenderer({
-                canvas: document.getElementById('bg-canvas'),
-                alpha: true, antialias: true
-            });
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-
-            const geometry = new THREE.IcosahedronGeometry(2.5, 2);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15 });
+            const geometry = new THREE.IcosahedronGeometry(2.5, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
             coreMesh = new THREE.Mesh(geometry, material);
             scene.add(coreMesh);
-
-            const pointsGeom = new THREE.BufferGeometry();
-            const posArray = new Float32Array(1200 * 3);
-            for (let i = 0; i < 3600; i++) posArray[i] = (Math.random() - 0.5) * 15;
-            pointsGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            particles = new THREE.Points(pointsGeom, new THREE.PointsMaterial({ size: 0.015, color: 0x00f2ff, transparent: true, opacity: 0.2 }));
-            scene.add(particles);
-
             animate();
         }
-
         function animate() {
             requestAnimationFrame(animate);
-            if (coreMesh) { coreMesh.rotation.y += 0.002; coreMesh.rotation.x += 0.001; }
-            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
-            camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
+            if (coreMesh) coreMesh.rotation.y += 0.001;
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => {
-            if (!camera || !renderer) return;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        // --- CONTACT FORM LOGIC ---
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('status-msg');
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
-            const cursor = document.querySelector('.cursor');
-            if (cursor) {
-                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+        contactForm.onsubmit = async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Transmitting...";
+            
+            const formData = new FormData(contactForm);
+            
+            try {
+                const response = await fetch('contact.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                statusMsg.classList.remove('hidden', 'border-red-500/30', 'bg-red-500/5', 'text-red-500', 'border-primary/30', 'bg-primary/5', 'text-primary');
+                
+                if (result.status === 'success') {
+                    statusMsg.classList.add('border-primary/30', 'bg-primary/5', 'text-primary');
+                    statusMsg.innerHTML = "⚡ Transmission Successful. We will respond shortly.";
+                    contactForm.reset();
+                } else {
+                    statusMsg.classList.add('border-red-500/30', 'bg-red-500/5', 'text-red-500');
+                    statusMsg.innerText = "Error: " + (result.message || "Failed to transmit message.");
+                }
+            } catch (error) {
+                statusMsg.classList.remove('hidden');
+                statusMsg.classList.add('border-red-500/30', 'bg-red-500/5', 'text-red-500');
+                statusMsg.innerText = "Transmission Error. Check your connection.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Transmit Message";
             }
-        });
+        };
 
-        // --- THEME LOGIC ---
+        // Theme Toggle
         const themeBtn = document.getElementById('theme-btn');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
-
-        themeBtn.addEventListener('click', () => {
+        themeBtn.onclick = () => {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
-
-            if (isLight) { sunIcon.classList.remove('hidden'); moonIcon.classList.add('hidden'); }
-            else { sunIcon.classList.add('hidden'); moonIcon.classList.remove('hidden'); }
-
             const color = isLight ? 0x4f46e5 : 0x00f2ff;
-            if (coreMesh) {
-                coreMesh.material.color.setHex(color);
-                coreMesh.material.opacity = isLight ? 0.08 : 0.15;
-            }
-            if (particles) {
-                particles.material.color.setHex(color);
-                particles.material.opacity = isLight ? 0.12 : 0.2;
-            }
-        });
+            coreMesh.material.color.setHex(color);
+            document.getElementById('theme-path').setAttribute('d', isLight ?
+                "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" :
+                "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z");
+        };
 
+        window.onload = initThree;
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
         }, { threshold: 0.1 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        window.onload = initThree;
     </script>
 </body>
 
