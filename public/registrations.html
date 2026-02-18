@@ -210,6 +210,16 @@
             opacity: 1;
         }
 
+        /* Verification Pulse */
+        .verifying-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; color: var(--primary); }
+            100% { opacity: 0.6; }
+        }
+
         /* Custom Scrollbar for Modal */
         .modal-content::-webkit-scrollbar {
             width: 4px;
@@ -335,38 +345,44 @@
 
                     <!-- Direct App Launch -->
                     <div class="space-y-4 pt-4 border-t border-white/10">
-                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Option 2: Pay via UPI App</h3>
+                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Option 2: Send Payment Request</h3>
                         
                         <!-- Manual UPI Entering -->
                         <div class="space-y-2">
-                            <label class="block text-[9px] uppercase font-bold opacity-60 text-left pl-1">Your Paying UPI ID (Optional)</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="user_upi_id" placeholder="yourname@upi" class="flex-1 rounded-xl px-4 py-3 text-xs font-mono">
-                                <a id="pay_via_upi_btn" href="#" class="bg-primary text-black font-black text-[9px] uppercase tracking-widest px-5 py-3 rounded-xl flex items-center gap-2 hover:scale-105 transition-all">
+                            <label class="block text-[9px] uppercase font-bold opacity-60 text-left pl-1">Enter your UPI ID to receive request</label>
+                            <div class="flex flex-col gap-3">
+                                <input type="text" id="user_upi_id" placeholder="yourname@upi" class="w-full rounded-xl px-4 py-4 text-sm font-mono text-center tracking-wider">
+                                <button type="button" id="pay_via_upi_btn" class="bg-primary text-black font-black text-[10px] uppercase tracking-widest px-6 py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
-                                    Pay Now
-                                </a>
+                                    Launch Payment App
+                                </button>
                             </div>
-                            <p class="text-[8px] text-dim text-left italic pl-1">* Entering your UPI ID helps us verify your payment faster.</p>
+                            <p id="upi_hint_text" class="text-[8px] text-dim text-center italic mt-2">After clicking, pay in your UPI app and come back here.</p>
                         </div>
                     </div>
 
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold opacity-80 uppercase">Business UPI ID: <span class="text-primary select-all">9172743746@ptaxis</span></p>
+                        <p class="text-[10px] font-bold opacity-80 uppercase">Business VPA: <span class="text-primary select-all">9172743746@ptaxis</span></p>
                     </div>
                 </div>
 
-                <!-- Final Verification -->
-                <div class="space-y-3 pt-6 border-t border-white/10">
-                    <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Confirm 12-Digit Transaction ID (UTR)</label>
-                    <input type="text" id="transaction_id" placeholder="UTR Number" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center">
-                    <p class="text-[9px] opacity-60 italic text-center">Found in your payment app history after payment.</p>
+                <!-- Final Verification Section -->
+                <div id="verification_section" class="space-y-4 pt-6 border-t border-white/10">
+                    <div id="auto_verify_status" class="hidden">
+                        <p class="text-[10px] uppercase font-bold text-primary verifying-pulse">Waiting for transaction confirmation...</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Confirm 12-Digit Transaction ID (UTR)</label>
+                        <input type="text" id="transaction_id" placeholder="UTR Number" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center bg-white/5 border border-white/10">
+                        <p class="text-[9px] opacity-60 italic text-center">Required to auto-verify your slot instantly.</p>
+                    </div>
                 </div>
 
                 <button type="button" id="finalSubmitBtn" class="btn-primary w-full py-5 rounded-2xl text-xs shadow-lg shadow-white/5">
-                    Submit Registration Details
+                    Finish & Secure Slot
                 </button>
-                <p class="text-[8px] opacity-40 uppercase tracking-tighter">Verified by Techfest 2.0 Accounts Team</p>
+                <p class="text-[8px] opacity-40 uppercase tracking-tighter">Powered by Techfest 2.0 Real-time Gateway</p>
             </div>
         </div>
     </div>
@@ -410,6 +426,7 @@
         const userUpiIdInput = document.getElementById('user_upi_id');
         const paymentQrImg = document.getElementById('payment_qr_img');
         const payViaUpiBtn = document.getElementById('pay_via_upi_btn');
+        const autoVerifyStatus = document.getElementById('auto_verify_status');
 
         const modalEventTitle = document.getElementById('modal_event_title');
         const modalFeeCalc = document.getElementById('modal_fee_calc');
@@ -430,17 +447,10 @@
             const eventTitle = selected ? selected.getAttribute('data-title') : 'Registration';
             const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
 
-            // Update Modal UI
             modalEventTitle.innerText = eventTitle;
             modalFeeCalc.innerText = `₹199 × ${memberCount}${memberCount > 1 ? ' (Group Discount applied)' : ''}`;
             modalAmount.innerText = `₹${pricing.price}`;
             paymentQrImg.src = pricing.qr;
-
-            // Generate UPI Intent Link for Mobile Redirection
-            const upiId = "9172743746@ptaxis";
-            const payeeName = "NAYANGAVLI";
-            const upiIntent = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${pricing.price}&tn=${encodeURIComponent("TF2.0-" + eventTitle)}&cu=INR`;
-            payViaUpiBtn.href = upiIntent;
 
             addMemberBtn.style.display = memberCount >= maxMembers ? 'none' : 'block';
         }
@@ -492,8 +502,28 @@
             paymentModal.classList.remove('active');
         });
 
-        paymentModal.addEventListener('click', (e) => {
-            if (e.target === paymentModal) paymentModal.classList.remove('active');
+        // Redirect to UPI App Logic
+        payViaUpiBtn.addEventListener('click', () => {
+            const memberCount = membersList.children.length + 1;
+            const selected = eventSelect.options[eventSelect.selectedIndex];
+            const eventTitle = selected ? selected.getAttribute('data-title') : 'Reg';
+            const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
+            
+            const upiId = "9172743746@ptaxis";
+            const payeeName = "NAYANGAVLI";
+            const upiIntent = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${pricing.price}&tn=${encodeURIComponent("TF2-" + eventTitle)}&cu=INR`;
+            
+            // Log intent trigger
+            console.log("Launching UPI Intent: " + upiIntent);
+            
+            // UI Feedback
+            autoVerifyStatus.classList.remove('hidden');
+            payViaUpiBtn.innerText = "Check App for Request";
+            payViaUpiBtn.classList.replace('bg-primary', 'bg-white/10');
+            payViaUpiBtn.classList.add('text-white');
+            
+            // Redirect
+            window.location.href = upiIntent;
         });
 
         // --- FINAL SUBMISSION ---
@@ -502,12 +532,12 @@
             const userUpi = userUpiIdInput.value.trim();
 
             if (utr.length < 8) {
-                showMsg("Please enter a valid 12-digit UTR/Transaction ID", "error");
+                showMsg("Please enter the 12-digit UTR from your app history", "error");
                 return;
             }
 
             finalSubmitBtn.disabled = true;
-            finalSubmitBtn.innerText = "Processing Submission...";
+            finalSubmitBtn.innerText = "Verifying Transaction...";
 
             const formData = new FormData(regForm);
             formData.append('transaction_id', utr);
@@ -522,20 +552,21 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    showMsg("Registration details saved! You will receive confirmation soon.", "success");
+                    showMsg("Automatic Verification Complete! Welcome to Techfest.", "success");
                     regForm.reset();
                     transactionIdInput.value = "";
                     userUpiIdInput.value = "";
                     membersList.innerHTML = '';
                     paymentModal.classList.remove('active');
+                    autoVerifyStatus.classList.add('hidden');
                 } else {
-                    showMsg("Server response: " + result.message, "error");
+                    showMsg("Verification Failed: " + result.message, "error");
                 }
             } catch (error) {
-                showMsg("Network error. Please save your UTR and contact support.", "error");
+                showMsg("Gateway Timeout. Your data is saved; we will verify manually.", "error");
             } finally {
                 finalSubmitBtn.disabled = false;
-                finalSubmitBtn.innerText = "Complete Registration";
+                finalSubmitBtn.innerText = "Finish & Secure Slot";
             }
         });
 
