@@ -193,7 +193,9 @@
 
         .modal-content {
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
             transform: translateY(20px);
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -206,6 +208,15 @@
         .modal-overlay.active .modal-content {
             transform: translateY(0);
             opacity: 1;
+        }
+
+        /* Custom Scrollbar for Modal */
+        .modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -288,7 +299,7 @@
                         </div>
                     </div>
 
-                    <button type="button" id="proceedBtn" class="btn-primary w-full py-5 rounded-2xl text-sm">
+                    <button type="button" id="proceedBtn" class="btn-primary w-full py-5 rounded-2xl text-sm shadow-xl shadow-primary/10">
                         Proceed to Payment
                     </button>
                 </form>
@@ -298,40 +309,64 @@
 
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal-overlay">
-        <div class="modal-content glass-card rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-            <button type="button" id="closeModal" class="absolute top-4 right-4 text-dim hover:text-white">
+        <div class="modal-content glass-card rounded-3xl p-8 shadow-2xl relative">
+            <button type="button" id="closeModal" class="absolute top-4 right-4 text-dim hover:text-white transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
             <div class="text-center space-y-6">
                 <div class="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex flex-col gap-1">
-                    <span id="modal_event_title" class="text-primary font-bold text-xs uppercase tracking-widest">Project Expo</span>
+                    <span id="modal_event_title" class="text-primary font-bold text-xs uppercase tracking-widest">Event Name</span>
                     <div class="flex justify-between items-center mt-2">
                         <span id="modal_fee_calc" class="text-[10px] font-bold opacity-60 uppercase">₹199 × 1</span>
                         <span id="modal_amount" class="text-2xl font-black font-tech text-primary">₹199</span>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Scan QR to Pay</h3>
-                    <div class="bg-white p-3 rounded-xl inline-block mx-auto relative group">
-                        <img id="payment_qr_img" src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/199.jpeg" alt="Payment QR Code" class="w-44 h-44 object-contain" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9172743746@ptaxis&pn=NAYANGAVLI&am=199';">
+                <!-- Payment Options -->
+                <div class="space-y-6">
+                    <!-- QR Code Section -->
+                    <div class="space-y-3">
+                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Option 1: Scan QR to Pay</h3>
+                        <div class="bg-white p-3 rounded-xl inline-block mx-auto relative group">
+                            <img id="payment_qr_img" src="" alt="Payment QR Code" class="w-44 h-44 object-contain" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9172743746@ptaxis&pn=NAYANGAVLI&am=199';">
+                        </div>
                     </div>
+
+                    <!-- Direct App Launch -->
+                    <div class="space-y-4 pt-4 border-t border-white/10">
+                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Option 2: Pay via UPI App</h3>
+                        
+                        <!-- Manual UPI Entering -->
+                        <div class="space-y-2">
+                            <label class="block text-[9px] uppercase font-bold opacity-60 text-left pl-1">Your Paying UPI ID (Optional)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="user_upi_id" placeholder="yourname@upi" class="flex-1 rounded-xl px-4 py-3 text-xs font-mono">
+                                <a id="pay_via_upi_btn" href="#" class="bg-primary text-black font-black text-[9px] uppercase tracking-widest px-5 py-3 rounded-xl flex items-center gap-2 hover:scale-105 transition-all">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+                                    Pay Now
+                                </a>
+                            </div>
+                            <p class="text-[8px] text-dim text-left italic pl-1">* Entering your UPI ID helps us verify your payment faster.</p>
+                        </div>
+                    </div>
+
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold opacity-80 uppercase">UPI ID: <span class="text-primary select-all">9172743746@ptaxis</span></p>
-                        <p class="text-[9px] text-dim italic">Accepting all UPI Apps</p>
+                        <p class="text-[10px] font-bold opacity-80 uppercase">Business UPI ID: <span class="text-primary select-all">9172743746@ptaxis</span></p>
                     </div>
                 </div>
 
-                <div class="space-y-3 pt-4 border-t border-white/10">
-                    <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Enter 12-Digit Transaction ID / UTR</label>
-                    <input type="text" id="transaction_id" placeholder="Ex: 4029XXXXXXXX" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-widest">
+                <!-- Final Verification -->
+                <div class="space-y-3 pt-6 border-t border-white/10">
+                    <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Confirm 12-Digit Transaction ID (UTR)</label>
+                    <input type="text" id="transaction_id" placeholder="UTR Number" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center">
+                    <p class="text-[9px] opacity-60 italic text-center">Found in your payment app history after payment.</p>
                 </div>
 
-                <button type="button" id="finalSubmitBtn" class="btn-primary w-full py-4 rounded-xl text-xs">
-                    Complete Registration
+                <button type="button" id="finalSubmitBtn" class="btn-primary w-full py-5 rounded-2xl text-xs shadow-lg shadow-white/5">
+                    Submit Registration Details
                 </button>
-                <p class="text-[8px] opacity-50 uppercase tracking-tighter">Registration is subject to payment verification</p>
+                <p class="text-[8px] opacity-40 uppercase tracking-tighter">Verified by Techfest 2.0 Accounts Team</p>
             </div>
         </div>
     </div>
@@ -372,9 +407,10 @@
         const closeModal = document.getElementById('closeModal');
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
         const transactionIdInput = document.getElementById('transaction_id');
+        const userUpiIdInput = document.getElementById('user_upi_id');
         const paymentQrImg = document.getElementById('payment_qr_img');
+        const payViaUpiBtn = document.getElementById('pay_via_upi_btn');
 
-        // Modal Display Fields
         const modalEventTitle = document.getElementById('modal_event_title');
         const modalFeeCalc = document.getElementById('modal_fee_calc');
         const modalAmount = document.getElementById('modal_amount');
@@ -382,7 +418,7 @@
         let maxMembers = 1;
 
         const PRICING_MAP = {
-            1: { price: 199, qr: "https://github.com/Nayangawali237/tech-fest/blob/main/assets/images/199.png" },
+            1: { price: 199, qr: "https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/199.png" },
             2: { price: 399, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/399.jpeg" },
             3: { price: 599, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/599.jpeg" },
             4: { price: 799, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" }
@@ -392,14 +428,19 @@
             const memberCount = membersList.children.length + 1;
             const selected = eventSelect.options[eventSelect.selectedIndex];
             const eventTitle = selected ? selected.getAttribute('data-title') : 'Registration';
-            
             const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
 
-            // Pre-fill modal data
+            // Update Modal UI
             modalEventTitle.innerText = eventTitle;
-            modalFeeCalc.innerText = `₹199 × ${memberCount}${memberCount > 1 ? ' (Group Rate)' : ''}`;
+            modalFeeCalc.innerText = `₹199 × ${memberCount}${memberCount > 1 ? ' (Group Discount applied)' : ''}`;
             modalAmount.innerText = `₹${pricing.price}`;
             paymentQrImg.src = pricing.qr;
+
+            // Generate UPI Intent Link for Mobile Redirection
+            const upiId = "9172743746@ptaxis";
+            const payeeName = "NAYANGAVLI";
+            const upiIntent = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${pricing.price}&tn=${encodeURIComponent("TF2.0-" + eventTitle)}&cu=INR`;
+            payViaUpiBtn.href = upiIntent;
 
             addMemberBtn.style.display = memberCount >= maxMembers ? 'none' : 'block';
         }
@@ -438,7 +479,6 @@
 
         addMemberBtn.addEventListener('click', addMemberField);
 
-        // --- MULTI-STEP LOGIC ---
         proceedBtn.addEventListener('click', () => {
             if (regForm.checkValidity()) {
                 updatePrice();
@@ -452,7 +492,6 @@
             paymentModal.classList.remove('active');
         });
 
-        // Close modal on click outside
         paymentModal.addEventListener('click', (e) => {
             if (e.target === paymentModal) paymentModal.classList.remove('active');
         });
@@ -460,16 +499,19 @@
         // --- FINAL SUBMISSION ---
         finalSubmitBtn.addEventListener('click', async () => {
             const utr = transactionIdInput.value.trim();
+            const userUpi = userUpiIdInput.value.trim();
+
             if (utr.length < 8) {
-                showMsg("Please enter a valid Transaction ID / UTR", "error");
+                showMsg("Please enter a valid 12-digit UTR/Transaction ID", "error");
                 return;
             }
 
             finalSubmitBtn.disabled = true;
-            finalSubmitBtn.innerText = "Processing...";
+            finalSubmitBtn.innerText = "Processing Submission...";
 
             const formData = new FormData(regForm);
             formData.append('transaction_id', utr);
+            formData.append('payer_upi_id', userUpi);
 
             try {
                 const response = await fetch('registrations.php', {
@@ -480,15 +522,17 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    showMsg("Success! Registration sent for verification.", "success");
+                    showMsg("Registration details saved! You will receive confirmation soon.", "success");
                     regForm.reset();
+                    transactionIdInput.value = "";
+                    userUpiIdInput.value = "";
                     membersList.innerHTML = '';
                     paymentModal.classList.remove('active');
                 } else {
-                    showMsg("Error: " + result.message, "error");
+                    showMsg("Server response: " + result.message, "error");
                 }
             } catch (error) {
-                showMsg("Verification system offline. Please try again.", "error");
+                showMsg("Network error. Please save your UTR and contact support.", "error");
             } finally {
                 finalSubmitBtn.disabled = false;
                 finalSubmitBtn.innerText = "Complete Registration";
@@ -522,7 +566,6 @@
                 "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z");
         });
 
-        // Resize handler with safety guard
         window.addEventListener('resize', () => {
             if (camera && renderer) {
                 camera.aspect = window.innerWidth / window.innerHeight;
