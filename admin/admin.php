@@ -2,8 +2,8 @@
 // --- CONFIGURATION ---
 $ADMIN_PIN = "aditya"; 
 $host = "localhost";
-$username = "root";
-$password = "";
+$username = 'techfest_user';
+$password = 'StrongPassword123';
 $dbname = "techfest_db";
 
 session_start();
