@@ -1,7 +1,7 @@
 <?php
 /**
  * registrations.php - Backend for Techfest 2.0 Public Registration
- * Processes form submissions and saves them to the AWS EC2 MariaDB.
+ * Processes form submissions and saves them to the AWS EC2 MariaDB
  */
 header('Content-Type: application/json');
 
