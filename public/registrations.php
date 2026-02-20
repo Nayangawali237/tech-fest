@@ -4,8 +4,8 @@ header('Content-Type: application/json');
 // Database configuration
 $host = 'localhost';
 $db_name = 'techfest_db';
-$username = 'root';
-$password = ''; // Default for XAMPP is empty
+$username = 'techfest_user';
+$password = 'StrongPassword123';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
