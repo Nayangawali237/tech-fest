@@ -47,25 +47,13 @@
             transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        .font-tech {
+        h1, h2, h3, h4, h5, .font-tech {
             font-family: 'Orbitron', sans-serif;
             letter-spacing: -0.02em;
         }
 
-        .dynamic-text {
-            color: var(--text-main);
-            transition: color 0.5s ease;
-        }
-
-        .dynamic-dim {
-            color: var(--text-dim);
-            transition: color 0.5s ease;
-        }
+        .dynamic-text { color: var(--text-main); transition: color 0.5s ease; }
+        .dynamic-dim { color: var(--text-dim); transition: color 0.5s ease; }
 
         #bg-canvas {
             position: fixed;
@@ -98,13 +86,8 @@
             position: relative;
             display: flex;
             align-items: center;
-            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5),
-                0 5px 15px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5);
             transition: box-shadow 0.4s ease, background 0.5s ease;
-        }
-
-        body.light-mode .nav-float {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
         }
 
         .nav-link {
@@ -118,15 +101,11 @@
             transition: color 0.4s ease;
             position: relative;
             white-space: nowrap;
+            z-index: 1;
         }
 
-        .nav-link.active {
-            color: var(--bg);
-        }
-
-        body.light-mode .nav-link.active {
-            color: #fff;
-        }
+        .nav-link.active { color: var(--bg); }
+        body.light-mode .nav-link.active { color: #fff; }
 
         .nav-indicator {
             position: absolute;
@@ -153,7 +132,6 @@
             transition: all 0.3s ease;
             margin-left: 1rem;
             position: relative;
-            overflow: hidden;
         }
 
         /* --- MEMBER CARDS --- */
@@ -189,9 +167,7 @@
             transition: transform 0.6s ease;
         }
 
-        .member-card:hover .member-img {
-            transform: scale(1.1);
-        }
+        .member-card:hover .member-img { transform: scale(1.1); }
 
         .social-link-v2 {
             width: 32px;
@@ -247,6 +223,15 @@
             border-bottom: 2px solid var(--primary);
             padding-bottom: 4px;
         }
+
+        .phone-num {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-bottom: 12px;
+            display: block;
+        }
     </style>
 </head>
 
@@ -260,16 +245,14 @@
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="logo">
                 <a href="index.html" class="flex items-center gap-2 group">
-                    <span
-                        class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
-                        2.0</span>
+                    <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
                 </a>
             </div>
 
             <div class="flex items-center">
                 <div class="nav-float hidden xl:flex">
                     <div class="nav-indicator" id="nav-indicator"></div>
-                    <div class="nav-links-container" id="nav-container">
+                    <div class="nav-links-container flex relative" id="nav-container">
                         <a href="index.html" class="nav-link">Home</a>
                         <a href="events.html" class="nav-link">Events</a>
                         <a href="registrations.html" class="nav-link">Register</a>
@@ -282,37 +265,26 @@
                 </div>
 
                 <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
-                    <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg id="sun-icon" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    <svg id="moon-icon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
             </div>
 
-            <a href="registrations.html"
-                class="hidden md:block bg-white text-black text-[10px] uppercase font-black px-8 py-3.5 rounded-full hover:bg-cyan-400 transition-all">Join
-                Us</a>
+            <a href="registrations.html" class="hidden md:block bg-white text-black text-[10px] uppercase font-black px-8 py-3.5 rounded-full hover:bg-cyan-400 transition-all">Join Us</a>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="pt-48 pb-20 relative overflow-hidden">
+    <section class="pt-48 pb-20 relative">
         <div class="container max-w-7xl mx-auto px-6 text-center">
             <div class="reveal active">
-                <span
-                    class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Architects
-                    of Innovation</span>
-                <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Meet The
-                    <br><span class="text-primary italic">Team</span>
-                </h1>
-                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">The brilliant minds working
-                    behind the scenes to deliver a world-class technical experience.</p>
+                <span class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Architects of Innovation</span>
+                <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Meet The <br><span class="text-primary italic">Team</span></h1>
+                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">The brilliant minds working behind the scenes to deliver a world-class technical experience.</p>
             </div>
         </div>
     </section>
@@ -323,61 +295,57 @@
 
             <!-- Core Committee -->
             <div class="mb-32">
-                <div class="text-center mb-16 reveal active">
+                <div class="text-center mb-16 reveal">
                     <span class="section-tag">Leadership</span>
                     <h2 class="text-3xl font-black dynamic-text mt-2">Core Committee</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     <!-- Rohit -->
-                    <div class="member-card reveal active">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Rohit.JPG"
-                                alt="Rohit Kakad" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Rohit.JPG" alt="Rohit Kakad" class="member-img">
                         </div>
                         <h3 class="text-xl font-black dynamic-text mb-1">Rohit Kakad</h3>
-                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Chairperson</p>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Chairperson</p>
+                        <span class="phone-num">+91 90287 34278</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">💼</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:#" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Sumedha -->
-                    <div class="member-card reveal active" style="transition-delay: 0.1s;">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sumedha.PNG"
-                                alt="Sumedha Godke" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sumedha.PNG" alt="Sumedha Ghodke" class="member-img">
                         </div>
-                        <h3 class="text-xl font-black dynamic-text mb-1">Sumedha Godke</h3>
-                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Vice president</p>
+                        <h3 class="text-xl font-black dynamic-text mb-1">Sumedha Ghodke</h3>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Vice President</p>
+                        <span class="phone-num">+91 84595 93312</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">💼</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:sumedhaghodke1124@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Gagan -->
-                    <div class="member-card reveal active" style="transition-delay: 0.2s;">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Gagan%20Gaware.PNG"
-                                alt="Gagan Gaware" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Gagan%20Gaware.PNG" alt="Gagan Gaware" class="member-img">
                         </div>
                         <h3 class="text-xl font-black dynamic-text mb-1">Gagan Gaware</h3>
-                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Secretary</p>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Secretary</p>
+                        <span class="phone-num">+91 9175811770</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">💼</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:gagangaware070@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Utkarsh -->
-                    <div class="member-card reveal active" style="transition-delay: 0.3s;">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Utkarsh.JPG"
-                                alt="Utkarsh Patil" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Utkarsh.JPG" alt="Utkarsh Patil" class="member-img">
                         </div>
                         <h3 class="text-xl font-black dynamic-text mb-1">Utkarsh Patil</h3>
-                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Treasurer</p>
+                        <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Treasurer</p>
+                        <span class="phone-num">+91 87886 32561</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">💼</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:utkarshpatil330@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                 </div>
@@ -385,64 +353,57 @@
 
             <!-- Coordinators -->
             <div class="mb-32">
-                <div class="text-center mb-16 reveal active">
+                <div class="text-center mb-16 reveal">
                     <span class="section-tag">Management</span>
-                    <h2 class="text-3xl font-black dynamic-text mt-2">Event Coordinators</h2>
+                    <h2 class="text-3xl font-black dynamic-text mt-2">Executive Members</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     <!-- Shubham -->
-                    <div class="member-card reveal active">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Shubham%20Pete%20.PNG"
-                                alt="Shubham Pete" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Shubham%20Pete%20.PNG" alt="Shubham Pete" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Shubham Pete</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member/p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <span class="phone-num">+91 94218 49032</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">📘</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:peteshubham91@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Simran -->
-                    <div class="member-card reveal active" style="transition-delay: 0.1s;">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/simran.JPG"
-                                alt="Simran Khokale" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/simran.JPG" alt="Simran Khokale" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Simran Khokale</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member
-                        </p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <span class="phone-num">+91 96997 39762</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">📘</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:simrankhokale@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Tushar -->
-                    <div class="member-card reveal active" style="transition-delay: 0.2s;">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Tushar.JPG"
-                                alt="Tushar Shinde" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Tushar.JPG" alt="Tushar Shinde" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Tushar Shinde</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member
-                        </p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <span class="phone-num">+91 87674 13414</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">📘</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:tusharshinde5232@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Vrushali -->
-                    <div class="member-card reveal active" style="transition-delay: 0.3s;">
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Vrushali.PNG"
-                                alt="Vrushali Dube" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Vrushali.PNG" alt="Vrushali Dube" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Vrushali Dube</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-6">Executive Member
-                        </p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <span class="phone-num">+91 90218 37233</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">📘</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:#" class="social-link-v2">📧</a>
                         </div>
                     </div>
                 </div>
@@ -452,45 +413,50 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <!-- Tech Team -->
                 <div>
-                    <div class="mb-12 reveal active">
+                    <div class="mb-12 reveal">
                         <span class="section-tag">Infrastructure</span>
                         <h2 class="text-2xl font-black dynamic-text mt-2">Technical Team</h2>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="member-card reveal active">
+                        <div class="member-card reveal">
                             <div class="photo-wrapper h-48">
-                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sai.JPG"
-                                    alt="Sai Deokar" class="member-img">
+                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sai.JPG" alt="Sai Deokar" class="member-img">
                             </div>
                             <h3 class="text-lg font-black dynamic-text mb-1">Sai Deokar</h3>
-                            <p class="text-[9px] dynamic-dim uppercase tracking-widest">Executive Member</p>
+                            <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Executive Member</p>
+                            <span class="phone-num">+91 80551 07422</span>
+                            <div class="flex justify-center">
+                                <a href="mailto:saideokar35@gmail.com" class="social-link-v2">📧</a>
+                            </div>
                         </div>
-                        <div class="member-card reveal active" style="transition-delay: 0.1s;">
+                        <div class="member-card reveal">
                             <div class="photo-wrapper h-48">
-                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Renuka.JPG"
-                                    alt="Renuka Karle" class="member-img">
+                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Renuka.JPG" alt="Renuka Karle" class="member-img">
                             </div>
                             <h3 class="text-lg font-black dynamic-text mb-1">Renuka Karle</h3>
-                            <p class="text-[9px] dynamic-dim uppercase tracking-widest">Executive Member</p>
+                            <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Executive Member</p>
+                            <span class="phone-num">+91 73878 30337</span>
+                            <div class="flex justify-center">
+                                <a href="mailto:rtkarle03@gmail.com" class="social-link-v2">📧</a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <!-- Media -->
                 <div>
-                    <div class="mb-12 reveal active">
+                    <div class="mb-12 reveal">
                         <span class="section-tag">Publicity</span>
                         <h2 class="text-2xl font-black dynamic-text mt-2">Media & PR</h2>
                     </div>
-                    <div class="member-card reveal active max-w-sm">
+                    <div class="member-card reveal max-w-sm">
                         <div class="photo-wrapper">
-                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Viresh%20.JPG"
-                                alt="Viresh Nagthane" class="member-img">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Viresh%20.JPG" alt="Viresh Nagthane" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Viresh Nagthane</h3>
-                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-6">Social Media Manager</p>
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Social Media Manager</p>
+                        <span class="phone-num">+91 87880 21716</span>
                         <div class="flex justify-center gap-3">
-                            <a href="#" class="social-link-v2">📸</a>
-                            <a href="#" class="social-link-v2">📧</a>
+                            <a href="mailto:vireshnagthane9@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                 </div>
@@ -516,7 +482,7 @@
             const rect = element.getBoundingClientRect();
             const parentRect = navContainer.getBoundingClientRect();
             navIndicator.style.width = `${rect.width}px`;
-            navIndicator.style.left = `${rect.left - parentRect.left + 4}px`;
+            navIndicator.style.left = `${rect.left - parentRect.left}px`;
         }
 
         const activeLink = document.querySelector('.nav-link.active');
@@ -571,9 +537,7 @@
         }
 
         window.addEventListener('resize', () => {
-            // Guard against undefined objects if resize fires before initThree
             if (!camera || !renderer) return;
-
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
