@@ -2,14 +2,14 @@
 /**
  * accommodation.php - Backend for Techfest 2.0 Stay Arrangements
  * Database: techfest_db
- * Table: accommodation_requests 
+ * Table: stay_requests 
  * (Expected columns: id, full_name, college_name, gender, number_of_nights, check_in_date, phone_number, special_requirements, created_at)
  */
 
 ob_start();
 header('Content-Type: application/json');
 
-// 1. Database Configuration
+// 1. Database Configuration (Using credentials from register.php)
 $host = 'localhost';
 $db_name = 'techfest_db';
 $username = 'techfest_user';
@@ -17,7 +17,7 @@ $password = 'StrongPassword123';
 
 try {
     // 2. Establish Database Connection
-    $conn = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
+    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // 3. Process the POST Request
@@ -43,9 +43,26 @@ try {
         }
 
         // 4. Prepare SQL Statement
-        // Ensure you have created a table named 'accommodation_requests' with matching columns
-        $sql = "INSERT INTO  `stay_requests` (full_name, college_name, gender, number_of_nights, check_in_date, phone_number, special_requirements) 
-                VALUES (:full_name, :college_name, :gender, :nights, :check_in, :phone, :requirements)";
+        // Ensure you have created a table named 'stay_requests'
+        $sql = "INSERT INTO `stay_requests` (
+                    full_name, 
+                    college_name, 
+                    gender, 
+                    number_of_nights, 
+                    check_in_date, 
+                    phone_number, 
+                    special_requirements,
+                    created_at
+                ) VALUES (
+                    :full_name, 
+                    :college_name, 
+                    :gender, 
+                    :nights, 
+                    :check_in, 
+                    :phone, 
+                    :requirements,
+                    NOW()
+                )";
         
         $stmt = $conn->prepare($sql);
 
@@ -53,7 +70,7 @@ try {
         $stmt->bindParam(':full_name', $full_name);
         $stmt->bindParam(':college_name', $college_name);
         $stmt->bindParam(':gender', $gender);
-        $stmt->bindParam(':nights', $nights);
+        $stmt->bindParam(':nights', $nights, PDO::PARAM_INT);
         $stmt->bindParam(':check_in', $check_in);
         $stmt->bindParam(':phone', $phone);
         $stmt->bindParam(':requirements', $requirements);
