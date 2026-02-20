@@ -1,4 +1,9 @@
 <?php
+/**
+ * admin.php - Secure Owner Dashboard for Techfest 2.0
+ * Features: PIN-based login, Metrics, Data Management, Proof Verification, WhatsApp Integration
+ */
+
 // --- CONFIGURATION ---
 $ADMIN_PIN = "aditya"; 
 $host = "localhost";
@@ -76,7 +81,7 @@ if (isset($_SESSION['authenticated_owner'])) {
                            "Regards,\nTechfest Team";
                 $headers = "From: noreply@techfest.com";
 
-                // NOTE: The mail() function requires a configured SMTP server (like SendGrid or local MailHog)
+                // NOTE: The mail() function requires a configured SMTP server
                 // @mail($to, $subject, $message, $headers); 
             }
         }
@@ -165,6 +170,7 @@ if ($view == 'registrations') {
             --accent: #7000ff;
             --success: #00ff88;
             --warning: #ffaa00;
+            --danger: #ff4444;
         }
 
         body {
@@ -239,9 +245,7 @@ if ($view == 'registrations') {
             line-height: 1;
         }
 
-        .rev-value {
-            color: var(--success);
-        }
+        .rev-value { color: var(--success); }
 
         .login-overlay {
             position: fixed;
@@ -267,7 +271,7 @@ if ($view == 'registrations') {
             width: 100%;
             padding: 20px;
             background: #000;
-            border: 1px solid #333;
+            border: 1px solid var(--primary);
             color: var(--primary);
             border-radius: 16px;
             margin-bottom: 30px;
@@ -276,7 +280,6 @@ if ($view == 'registrations') {
             font-family: 'Orbitron';
             letter-spacing: 12px;
             outline: none;
-            border: 1px solid var(--primary);
         }
 
         .btn-unlock {
@@ -327,9 +330,7 @@ if ($view == 'registrations') {
         }
 
         @media (max-width: 1200px) {
-            .dashboard-layout {
-                grid-template-columns: 1fr;
-            }
+            .dashboard-layout { grid-template-columns: 1fr; }
         }
 
         .sidebar-card {
@@ -358,17 +359,8 @@ if ($view == 'registrations') {
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .event-name {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-        }
-
-        .event-count {
-            font-family: 'Orbitron';
-            font-weight: 900;
-            color: var(--primary);
-            font-size: 1rem;
-        }
+        .event-name { color: var(--text-dim); font-size: 0.95rem; }
+        .event-count { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1rem; }
 
         .table-wrapper {
             background: var(--bg-card);
@@ -378,11 +370,7 @@ if ($view == 'registrations') {
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
+        table { width: 100%; border-collapse: collapse; }
         th {
             background: rgba(255, 255, 255, 0.04);
             text-align: left;
@@ -393,16 +381,10 @@ if ($view == 'registrations') {
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
-        td {
-            padding: 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            font-size: 1rem;
-            vertical-align: top;
-        }
+        td { padding: 25px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 1rem; vertical-align: top; }
 
         .btn-delete {
-            color: #ff4444;
+            color: var(--danger);
             text-decoration: none;
             border: 1px solid rgba(255, 68, 68, 0.3);
             padding: 8px 16px;
@@ -415,19 +397,6 @@ if ($view == 'registrations') {
 
         .btn-delete:hover { background: rgba(255, 68, 68, 0.1); }
 
-        .badge {
-            background: rgba(0, 242, 255, 0.08);
-            color: var(--primary);
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            border: 1px solid rgba(0, 242, 255, 0.1);
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         .status-badge {
             padding: 6px 14px;
             border-radius: 8px;
@@ -436,6 +405,7 @@ if ($view == 'registrations') {
             font-family: 'Orbitron';
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: inline-block;
         }
         .status-verified { background: rgba(0, 255, 136, 0.15); color: var(--success); border: 1px solid var(--success); }
         .status-pending { background: rgba(255, 170, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
@@ -450,14 +420,7 @@ if ($view == 'registrations') {
             color: var(--text-dim);
         }
 
-        .team-label {
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            color: var(--primary);
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 1px;
-        }
+        .team-label { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--primary); margin-bottom: 6px; display: block; letter-spacing: 1px; }
 
         .dashboard-controls {
             display: flex;
@@ -479,11 +442,6 @@ if ($view == 'registrations') {
             cursor: pointer;
         }
 
-        .action-btns {
-            display: flex;
-            gap: 10px;
-        }
-
         .btn-action {
             padding: 12px 25px;
             border-radius: 12px;
@@ -493,10 +451,10 @@ if ($view == 'registrations') {
             font-weight: bold;
             transition: 0.3s;
             letter-spacing: 1px;
+            display: inline-block;
         }
-
         .btn-csv { background: #fff; color: #000; }
-        .btn-pdf { background: var(--bg-card); color: #fff; border: 1px solid var(--border); cursor: pointer; }
+        .btn-pdf { background: var(--bg-card); color: #fff; border: 1px solid var(--border); }
 
         .btn-util { padding: 10px 18px; border-radius: 10px; text-decoration: none; font-size: 0.75rem; font-weight: bold; border: 1px solid transparent; transition: 0.2s; cursor: pointer; display: inline-block; font-family: 'Orbitron'; letter-spacing: 1px; }
         .btn-view-proof { background: rgba(255,255,255,0.07); color: #fff; border-color: var(--border); margin-right: 5px; }
@@ -618,16 +576,10 @@ if ($view == 'registrations') {
                                 
                                 // Robust proof path handling
                                 $db_proof = $row['transaction_proof'];
-                                if (empty($db_proof)) {
-                                    $proof_file = 'uploads/default_proof.png';
-                                } else {
-                                    // Check if path already contains 'uploads/' prefix
-                                    $proof_file = (strpos($db_proof, 'uploads/') === 0) ? $db_proof : 'uploads/' . $db_proof;
-                                }
+                                $proof_file = empty($db_proof) ? 'uploads/default_proof.png' : ((strpos($db_proof, 'uploads/') === 0) ? $db_proof : 'uploads/' . $db_proof);
                                 
                                 // Generate WhatsApp Link
-                                $wa_message = urlencode("Hello " . $row['lead_name'] . ", your registration for " . $row['event_name'] . " at Techfest 2.0 has been VERIFIED. We look forward to seeing you!Stay updated with the latest announcements, schedules, and registration links.
-Join our official Techfest WhatsApp Group now!/ Open this link to join my WhatsApp Group: https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO?mode=gi_t");
+                                $wa_message = urlencode("Hello " . $row['lead_name'] . ", your registration for " . $row['event_name'] . " at Techfest 2.0 has been VERIFIED. We look forward to seeing you! Stay updated with the latest announcements, schedules, and registration links. Join our official Techfest WhatsApp Group now! https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO");
                                 $wa_link = "https://wa.me/" . preg_replace('/[^0-9]/', '', $row['lead_phone']) . "?text=" . $wa_message;
                             ?>
                             <tr>
@@ -728,16 +680,14 @@ Join our official Techfest WhatsApp Group now!/ Open this link to join my WhatsA
         </div>
     </div>
 
-    <!-- NEW: TRANSACTION PROOF MODAL -->
+    <!-- TRANSACTION PROOF MODAL -->
     <div id="proofModal" class="modal-overlay" onclick="closeProof(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h3 id="modalTitle" style="font-family: Orbitron; font-size: 1rem; margin: 0; color: var(--primary); letter-spacing: 2px;">PAYMENT_VERIFICATION_INTERFACE</h3>
                 <button class="btn-close" onclick="closeProof(null)">&times;</button>
             </div>
-            <div id="modalBody" class="modal-body">
-                <!-- Dynamic Payload -->
-            </div>
+            <div id="modalBody" class="modal-body"></div>
             <div style="padding: 20px 30px; border-top: 1px solid var(--border); text-align: right; background: rgba(0,0,0,0.7);">
                 <button onclick="closeProof(null)" class="btn-util" style="background: var(--primary); color: #000; padding: 15px 30px; font-size: 0.9rem;">DISCONNECT VIEWPORT</button>
             </div>
@@ -755,10 +705,8 @@ Join our official Techfest WhatsApp Group now!/ Open this link to join my WhatsA
             
             const extension = fileUrl.split('.').pop().toLowerCase();
             
-            // Artificial delay for technical feel
             setTimeout(() => {
                 if (extension === 'pdf') {
-                    // Optimized Iframe for PDF with fallback link
                     body.innerHTML = `
                         <div style="width:100%; height:100%; display:flex; flex-direction:column;">
                             <iframe src="${fileUrl}#toolbar=0" type="application/pdf" style="width:100%; flex:1; border:none;"></iframe>
@@ -767,10 +715,9 @@ Join our official Techfest WhatsApp Group now!/ Open this link to join my WhatsA
                             </div>
                         </div>`;
                 } else {
-                    // Image with responsive fit and centering
                     body.innerHTML = `
                         <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">
-                            <img src="${fileUrl}" alt="Payment Proof Attachment" style="max-width:95%; max-height:95%; object-fit:contain; box-shadow: 0 0 30px rgba(0,242,255,0.2);">
+                            <img src="${fileUrl}" alt="Payment Proof" style="max-width:95%; max-height:95%; object-fit:contain; box-shadow: 0 0 30px rgba(0,242,255,0.2);">
                         </div>`;
                 }
             }, 300);
@@ -784,13 +731,9 @@ Join our official Techfest WhatsApp Group now!/ Open this link to join my WhatsA
             document.getElementById('modalBody').innerHTML = '';
         }
 
-        // Close on Escape key
         document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeProof(null); });
     </script>
-
     <?php endif; ?>
-
 </body>
-
 </html>
 <?php $conn->close(); ?>
