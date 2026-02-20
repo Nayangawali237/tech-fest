@@ -131,6 +131,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-left: 1rem;
+            position: relative;
         }
 
         /* --- SPONSOR CARDS --- */
@@ -145,13 +146,13 @@
             align-items: center;
             justify-content: center;
             transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-            min-height: 120px;
+            min-height: 280px;
             overflow: hidden;
         }
 
         .sponsor-card-v2:hover {
             border-color: var(--primary);
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-8px) scale(1.01);
             box-shadow: 0 20px 40px -20px rgba(0, 242, 255, 0.2);
         }
 
@@ -159,60 +160,19 @@
             max-width: 80%;
             max-height: 180px;
             object-fit: contain;
-            filter: grayscale(1) brightness(2);
+            filter: grayscale(1) brightness(1.5);
             transition: all 0.4s ease;
-            opacity: 0.7;
+            opacity: 0.8;
         }
 
         body.light-mode .sponsor-logo-img {
-            filter: grayscale(1) brightness(0.2);
+            filter: grayscale(0.5) brightness(0.8);
         }
 
         .sponsor-card-v2:hover .sponsor-logo-img {
             filter: grayscale(0) brightness(1);
             opacity: 1;
             transform: scale(1.05);
-        }
-
-        .sponsor-logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            letter-spacing: 2px;
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
-        }
-
-        .sponsor-card-v2:hover .sponsor-logo-text {
-            opacity: 1;
-            color: var(--primary);
-        }
-
-        /* --- BENEFIT CARDS --- */
-        .benefit-card-v2 {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .benefit-card-v2:hover {
-            border-color: var(--primary);
-            background: rgba(0, 242, 255, 0.02);
-        }
-
-        .btn-primary-v2 {
-            background: var(--primary);
-            color: var(--bg);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            padding: 16px 40px;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            display: inline-block;
         }
 
         .reveal {
@@ -237,24 +197,6 @@
             transition: transform 0.1s ease;
             transform: translate(-50%, -50%);
         }
-
-        .tier-label {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 48px;
-            padding-bottom: 12px;
-        }
-
-        .tier-label::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 2px;
-            background: var(--primary);
-        }
     </style>
 </head>
 
@@ -266,14 +208,16 @@
     <!-- Header -->
     <header class="fixed top-8 left-0 w-full z-[100] px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-2 group">
-                <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
-            </a>
+            <div class="logo">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
+                </a>
+            </div>
 
             <div class="flex items-center">
                 <div class="nav-float hidden xl:flex">
                     <div class="nav-indicator" id="nav-indicator"></div>
-                    <div class="nav-links-container flex" id="nav-container">
+                    <div class="nav-links-container flex relative" id="nav-container">
                         <a href="index.html" class="nav-link">Home</a>
                         <a href="events.html" class="nav-link">Events</a>
                         <a href="registrations.html" class="nav-link">Register</a>
@@ -310,14 +254,18 @@
 
     <!-- Sponsors Section -->
     <section class="pb-24 px-6 relative z-10">
-        <div class="max-w-7xl mx-auto text-center">
-            <div class="mb-32 reveal active">
-                <div class="flex justify-center">
-                    <a href="https://scdsanjivani.awscc.tech/" target="_blank" class="sponsor-card-v2 w-full max-w-2xl min-h-[280px] gap-6 cursor-pointer">
-                        <img src="../assets/images/AWSCC_Sanjivani.png" alt="AWS Cloud Club Sanjivani" class="sponsor-logo-img">
-                        <p class="text-sm md:text-base font-semibold dynamic-dim tracking-wide mt-4">
-                            Tech Sponsor: AWS Cloud Club at Sanjivani College of Engineering
-                        </p>
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 gap-12 max-w-2xl mx-auto">
+                <!-- Tech Sponsor -->
+                <div class="reveal active">
+                    <a href="https://scdsanjivani.awscc.tech/" target="_blank" class="sponsor-card-v2 cursor-pointer">
+                        <img src="https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/AWSCC_Sanjivani.png" alt="AWS Cloud Club" class="sponsor-logo-img mb-6">
+                        <div class="text-center">
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary block mb-2">Tech Sponsor</span>
+                            <p class="text-sm md:text-base font-semibold dynamic-text tracking-wide">
+                                AWS Cloud Club Sanjivani
+                            </p>
+                        </div>
                     </a>
                 </div>
             </div>
@@ -331,6 +279,7 @@
     </footer>
 
     <script>
+        // --- NAVIGATION ---
         const navContainer = document.getElementById('nav-container');
         const navIndicator = document.getElementById('nav-indicator');
         const navLinks = document.querySelectorAll('.nav-link');
@@ -339,7 +288,7 @@
             const rect = element.getBoundingClientRect();
             const parentRect = navContainer.getBoundingClientRect();
             navIndicator.style.width = `${rect.width}px`;
-            navIndicator.style.left = `${rect.left - parentRect.left + 4}px`;
+            navIndicator.style.left = `${rect.left - parentRect.left}px`;
         }
 
         const activeLink = document.querySelector('.nav-link.active');
@@ -377,6 +326,7 @@
         }
 
         window.addEventListener('resize', () => {
+            if (!camera || !renderer) return;
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -387,7 +337,7 @@
             if (cursor) { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
         });
 
-        // Theme Toggle
+        // --- THEME TOGGLE ---
         const themeBtn = document.getElementById('theme-btn');
         themeBtn.onclick = () => {
             document.body.classList.toggle('light-mode');
