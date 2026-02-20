@@ -12,8 +12,8 @@ header('Content-Type: application/json');
 // 1. Database Configuration (Default for XAMPP/WAMP)
 $host = 'localhost';
 $db_name = 'techfest_db';
-$username = 'root';
-$password = '';
+$username = 'techfest_user';
+$password = 'StrongPassword123';
 
 try {
     // 2. Establish Database Connection using PDO
