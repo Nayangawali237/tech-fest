@@ -1,58 +1,76 @@
 <?php
 /**
- * Techfest 2.0 - Registration Handler
- * This script processes incoming registration POST requests and saves them to the database.
+ * registrations.php - Backend for Techfest 2.0 Public Registration
+ * Processes form submissions and saves them to the AWS EC2 MariaDB.
  */
 
 header('Content-Type: application/json');
 
-// Database configuration
-$host = 'localhost';
+// 1. Database Configuration
+$host = 'localhost'; // MariaDB on EC2
 $db_name = 'techfest_db';
 $username = 'techfest_user';
 $password = 'StrongPassword123';
 
 try {
-    // Create a new PDO instance
+    // Establishing secure connection
     $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
-    // Set error mode to exception to catch any database issues
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     echo json_encode([
         'status' => 'error', 
-        'message' => 'Connection failed: ' . $e->getMessage()
+        'message' => 'Cloud Database Connection Failed: ' . $e->getMessage()
     ]);
     exit;
 }
 
-// Get form data with null coalescing for safety
-$event_name = $_POST['event_name'] ?? '';
-$category = $_POST['category'] ?? 'General';
-$team_name = $_POST['team_name'] ?? 'Solo';
-$lead_name = $_POST['lead_name'] ?? '';
-$lead_phone = $_POST['lead_phone'] ?? '';
-$lead_email = $_POST['lead_email'] ?? '';
-$college = $_POST['college'] ?? '';
+// 2. Extract and Sanitize POST Data
+$event_name  = strip_tags($_POST['event_name'] ?? '');
+$category    = strip_tags($_POST['category'] ?? 'General');
+$team_name   = strip_tags($_POST['team_name'] ?? 'Solo');
+$lead_name   = strip_tags($_POST['lead_name'] ?? '');
+$lead_phone  = strip_tags($_POST['lead_phone'] ?? '');
+$lead_email  = filter_var($_POST['lead_email'] ?? '', FILTER_SANITIZE_EMAIL);
+$college     = strip_tags($_POST['college'] ?? '');
 
 // Handle dynamic members calculation
-// Expecting 'member_names' to be an array from the frontend
 $members = isset($_POST['member_names']) && is_array($_POST['member_names']) ? $_POST['member_names'] : [];
-$participant_count = count($members) + 1; // Lead student + additional members
-$total_fee = $participant_count * 199;    // Fee calculation: 199 INR per head
-$members_string = implode(', ', $members);
+$participant_count = count($members) + 1; // Lead + Team Members
+$total_fee = $participant_count * 199;    // 199 INR per head
+$members_string = implode(', ', array_map('strip_tags', $members));
 
-// Basic Server-side Validation
+// 3. Handle File Upload (Transaction Proof)
+// Admin Dashboard expects this file to be in the 'uploads/' directory
+$proof_filename = ''; 
+if (isset($_FILES['transaction_proof']) && $_FILES['transaction_proof']['error'] === UPLOAD_ERR_OK) {
+    $upload_dir = 'uploads/';
+    
+    // Create directory if it doesn't exist on EC2
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+
+    $file_ext = strtolower(pathinfo($_FILES['transaction_proof']['name'], PATHINFO_EXTENSION));
+    $new_name = "proof_" . time() . "_" . bin2hex(random_bytes(4)) . "." . $file_ext;
+    $target_path = $upload_dir . $new_name;
+
+    if (move_uploaded_file($_FILES['transaction_proof']['tmp_name'], $target_path)) {
+        $proof_filename = $new_name;
+    }
+}
+
+// 4. Basic Validation
 if (empty($event_name) || empty($lead_name) || empty($lead_phone)) {
     echo json_encode([
         'status' => 'error', 
-        'message' => 'Missing required fields. Please ensure Event Name, Name, and Phone are provided.'
+        'message' => 'Transmission error: Required fields are missing.'
     ]);
     exit;
 }
 
 try {
-    // Prepare the SQL statement
-    // Note: Ensure your 'registrations' table matches these column names
+    // 5. Prepare and Execute SQL
+    // Note: payment_status defaults to 'Pending'
     $sql = "INSERT INTO registrations (
                 event_name, 
                 category, 
@@ -62,7 +80,9 @@ try {
                 lead_email, 
                 college, 
                 additional_members, 
-                total_fee,
+                total_fee, 
+                transaction_proof,
+                payment_status,
                 created_at
             ) VALUES (
                 :event_name, 
@@ -73,13 +93,14 @@ try {
                 :lead_email, 
                 :college, 
                 :members, 
-                :fee,
+                :fee, 
+                :proof,
+                'Pending',
                 NOW()
             )";
     
     $stmt = $pdo->prepare($sql);
     
-    // Execute with mapped parameters
     $stmt->execute([
         ':event_name' => $event_name,
         ':category'   => $category,
@@ -89,21 +110,21 @@ try {
         ':lead_email' => $lead_email,
         ':college'    => $college,
         ':members'    => $members_string,
-        ':fee'        => $total_fee
+        ':fee'        => $total_fee,
+        ':proof'      => $proof_filename
     ]);
 
-    // Send successful response to the frontend AJAX call
+    // 6. Success Response
     echo json_encode([
         'status' => 'success', 
-        'message' => 'Registration for ' . htmlspecialchars($event_name) . ' saved successfully!',
-        'total_payable' => $total_fee
+        'message' => 'Registration for ' . htmlspecialchars($event_name) . ' successful! Please wait for admin verification.',
+        'fee_calculated' => $total_fee
     ]);
 
 } catch (PDOException $e) {
-    // Check for specific errors like duplicate entries if you have unique constraints
     echo json_encode([
         'status' => 'error', 
-        'message' => 'Database error: ' . $e->getMessage()
+        'message' => 'Database operation failed: ' . $e->getMessage()
     ]);
 }
 ?>
