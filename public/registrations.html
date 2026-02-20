@@ -150,21 +150,6 @@
             cursor: pointer;
         }
 
-        .member-row {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         #status-msg {
             position: fixed;
             bottom: 24px;
@@ -178,7 +163,6 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
 
-        /* Modal Specific Styles */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -210,7 +194,6 @@
             opacity: 1;
         }
 
-        /* Verification Pulse */
         .verifying-pulse {
             animation: pulse 2s infinite;
         }
@@ -218,15 +201,6 @@
             0% { opacity: 0.6; }
             50% { opacity: 1; color: var(--primary); }
             100% { opacity: 0.6; }
-        }
-
-        /* Custom Scrollbar for Modal */
-        .modal-content::-webkit-scrollbar {
-            width: 4px;
-        }
-        .modal-content::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
         }
     </style>
 </head>
@@ -257,13 +231,12 @@
     <main class="pt-32 pb-20 px-6">
         <div class="max-w-2xl mx-auto">
             <div class="text-center mb-12">
-                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Step Into The Future</span>
-                <h1 class="text-5xl font-black mt-4 font-tech tracking-tight">Event Registration</h1>
+                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Secure Your Slot</span>
+                <h1 class="text-5xl font-black mt-4 font-tech tracking-tight">Registration</h1>
             </div>
 
             <div class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl">
                 <form id="regForm" class="space-y-8">
-                    <!-- Event Selection -->
                     <div>
                         <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Target Event</label>
                         <select name="event_name" id="event_name" required class="w-full rounded-xl px-5 py-4">
@@ -278,16 +251,14 @@
                         </select>
                     </div>
 
-                    <!-- Team Details -->
                     <div id="team_info_group" class="hidden space-y-6">
                         <div>
                             <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Team Name</label>
                             <input type="text" name="team_name" id="team_name" placeholder="Enter team name" class="w-full rounded-xl px-5 py-4">
                         </div>
-
                         <div id="members_container" class="space-y-4">
                             <div class="flex justify-between items-center">
-                                <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Additional Team Members</label>
+                                <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Team Members</label>
                                 <button type="button" id="add_member_btn" class="text-[9px] font-black bg-primary/10 text-primary border border-primary/20 px-4 py-2 rounded-full hover:bg-primary hover:text-black transition-all">
                                     + Add Member
                                 </button>
@@ -296,7 +267,6 @@
                         </div>
                     </div>
 
-                    <!-- Lead Representative -->
                     <div class="pt-6 border-t border-white/10">
                         <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-6">Lead Participant Details</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -305,7 +275,7 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <input type="email" name="lead_email" placeholder="Email Address" required class="w-full rounded-xl px-5 py-4">
-                            <input type="text" name="college" placeholder="College/Institution" required class="w-full rounded-xl px-5 py-4">
+                            <input type="text" name="college" placeholder="College Name" required class="w-full rounded-xl px-5 py-4">
                         </div>
                     </div>
 
@@ -325,64 +295,45 @@
             </button>
 
             <div class="text-center space-y-6">
-                <div class="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex flex-col gap-1">
-                    <span id="modal_event_title" class="text-primary font-bold text-xs uppercase tracking-widest">Event Name</span>
+                <div class="bg-primary/5 border border-primary/20 rounded-2xl p-4">
+                    <span id="modal_event_title" class="text-primary font-bold text-xs uppercase tracking-widest">Event</span>
                     <div class="flex justify-between items-center mt-2">
                         <span id="modal_fee_calc" class="text-[10px] font-bold opacity-60 uppercase">₹199 × 1</span>
                         <span id="modal_amount" class="text-2xl font-black font-tech text-primary">₹199</span>
                     </div>
                 </div>
 
-                <!-- Payment Options -->
                 <div class="space-y-6">
-                    <!-- QR Code Section -->
                     <div class="space-y-3">
-                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Option 1: Scan QR to Pay</h3>
-                        <div class="bg-white p-3 rounded-xl inline-block mx-auto relative group">
-                            <img id="payment_qr_img" src="" alt="Payment QR Code" class="w-44 h-44 object-contain" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9172743746@ptaxis&pn=NAYANGAVLI&am=199';">
+                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Scan QR to Pay</h3>
+                        <div class="bg-white p-3 rounded-xl inline-block mx-auto">
+                            <img id="payment_qr_img" src="" alt="QR" class="w-44 h-44 object-contain">
                         </div>
                     </div>
 
-                    <!-- Direct App Launch -->
                     <div class="space-y-4 pt-4 border-t border-white/10">
-                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Option 2: Send Payment Request</h3>
-                        
-                        <!-- Manual UPI Entering -->
+                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Receive UPI Request</h3>
                         <div class="space-y-2">
-                            <label class="block text-[9px] uppercase font-bold opacity-60 text-left pl-1">Enter your UPI ID to receive request</label>
-                            <div class="flex flex-col gap-3">
-                                <input type="text" id="user_upi_id" placeholder="yourname@upi" class="w-full rounded-xl px-4 py-4 text-sm font-mono text-center tracking-wider">
-                                <button type="button" id="pay_via_upi_btn" class="bg-primary text-black font-black text-[10px] uppercase tracking-widest px-6 py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
-                                    Launch Payment App
-                                </button>
-                            </div>
-                            <p id="upi_hint_text" class="text-[8px] text-dim text-center italic mt-2">After clicking, pay in your UPI app and come back here.</p>
+                            <input type="text" id="user_upi_id" placeholder="Enter UPI ID (e.g. name@upi)" class="w-full rounded-xl px-4 py-4 text-sm font-mono text-center">
+                            <button type="button" id="pay_via_upi_btn" class="bg-primary text-black font-black text-[10px] uppercase tracking-widest px-6 py-4 rounded-xl w-full">
+                                Launch Payment Request
+                            </button>
                         </div>
                     </div>
-
-                    <div class="space-y-1">
-                        <p class="text-[10px] font-bold opacity-80 uppercase">Business VPA: <span class="text-primary select-all">9172743746@ptaxis</span></p>
-                    </div>
                 </div>
 
-                <!-- Final Verification Section -->
-                <div id="verification_section" class="space-y-4 pt-6 border-t border-white/10">
-                    <div id="auto_verify_status" class="hidden">
-                        <p class="text-[10px] uppercase font-bold text-primary verifying-pulse">Waiting for transaction confirmation...</p>
-                    </div>
-                    
+                <!-- UTR Input Section -->
+                <div class="space-y-4 pt-6 border-t border-white/10">
                     <div class="space-y-3">
-                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Confirm 12-Digit Transaction ID (UTR)</label>
-                        <input type="text" id="transaction_id" placeholder="UTR Number" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center bg-white/5 border border-white/10">
-                        <p class="text-[9px] opacity-60 italic text-center">Required to auto-verify your slot instantly.</p>
+                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Confirm Transaction UTR (12-Digits)</label>
+                        <input type="text" id="transaction_id" placeholder="Enter UTR Number" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center">
+                        <p class="text-[9px] opacity-60 italic">Check your transaction history for the 12-digit UTR/Ref number.</p>
                     </div>
                 </div>
 
-                <button type="button" id="finalSubmitBtn" class="btn-primary w-full py-5 rounded-2xl text-xs shadow-lg shadow-white/5">
+                <button type="button" id="finalSubmitBtn" class="btn-primary w-full py-5 rounded-2xl text-xs">
                     Finish & Secure Slot
                 </button>
-                <p class="text-[8px] opacity-40 uppercase tracking-tighter">Powered by Techfest 2.0 Real-time Gateway</p>
             </div>
         </div>
     </div>
@@ -390,7 +341,7 @@
     <div id="status-msg"></div>
 
     <script>
-        // --- THREE.JS BACKGROUND ---
+        // --- THREE.JS ---
         let scene, camera, renderer, coreMesh;
         function initThree() {
             scene = new THREE.Scene();
@@ -405,13 +356,12 @@
             animate();
         }
         function animate() {
-            if (!renderer || !scene || !camera) return;
             requestAnimationFrame(animate);
             if (coreMesh) coreMesh.rotation.y += 0.001;
             renderer.render(scene, camera);
         }
 
-        // --- DOM ELEMENTS ---
+        // --- FORM LOGIC ---
         const eventSelect = document.getElementById('event_name');
         const teamInfoGroup = document.getElementById('team_info_group');
         const membersList = document.getElementById('members_list');
@@ -426,19 +376,12 @@
         const userUpiIdInput = document.getElementById('user_upi_id');
         const paymentQrImg = document.getElementById('payment_qr_img');
         const payViaUpiBtn = document.getElementById('pay_via_upi_btn');
-        const autoVerifyStatus = document.getElementById('auto_verify_status');
-
-        const modalEventTitle = document.getElementById('modal_event_title');
-        const modalFeeCalc = document.getElementById('modal_fee_calc');
-        const modalAmount = document.getElementById('modal_amount');
-
-        let maxMembers = 1;
 
         const PRICING_MAP = {
             1: { price: 199, qr: "https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/199.png" },
-            2: { price: 399, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/399.jpeg" },
-            3: { price: 599, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/599.jpeg" },
-            4: { price: 799, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" }
+            2: { price: 398, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/399.jpeg" },
+            3: { price: 597, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/599.jpeg" },
+            4: { price: 796, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" }
         };
 
         function updatePrice() {
@@ -447,47 +390,33 @@
             const eventTitle = selected ? selected.getAttribute('data-title') : 'Registration';
             const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
 
-            modalEventTitle.innerText = eventTitle;
-            modalFeeCalc.innerText = `₹199 × ${memberCount}${memberCount > 1 ? ' (Group Discount applied)' : ''}`;
-            modalAmount.innerText = `₹${pricing.price}`;
+            document.getElementById('modal_event_title').innerText = eventTitle;
+            document.getElementById('modal_fee_calc').innerText = `₹199 × ${memberCount}`;
+            document.getElementById('modal_amount').innerText = `₹${pricing.price}`;
             paymentQrImg.src = pricing.qr;
-
-            addMemberBtn.style.display = memberCount >= maxMembers ? 'none' : 'block';
-        }
-
-        function addMemberField() {
-            if (membersList.children.length + 1 >= maxMembers) return;
-            const div = document.createElement('div');
-            div.className = 'flex gap-2 member-row';
-            div.innerHTML = `
-                <input type="text" name="member_names[]" placeholder="Member Full Name" required 
-                       class="flex-1 rounded-xl px-5 py-3 text-sm">
-                <button type="button" class="remove-member p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            `;
-            div.querySelector('.remove-member').onclick = () => { div.remove(); updatePrice(); };
-            membersList.appendChild(div);
-            updatePrice();
         }
 
         eventSelect.addEventListener('change', () => {
             const selected = eventSelect.options[eventSelect.selectedIndex];
-            if (!selected) return;
             const type = selected.getAttribute('data-type');
-            maxMembers = parseInt(selected.getAttribute('data-max'));
             if (type === 'team') {
                 teamInfoGroup.classList.remove('hidden');
-                document.getElementById('team_name').required = true;
             } else {
                 teamInfoGroup.classList.add('hidden');
-                document.getElementById('team_name').required = false;
                 membersList.innerHTML = '';
             }
             updatePrice();
         });
 
-        addMemberBtn.addEventListener('click', addMemberField);
+        addMemberBtn.addEventListener('click', () => {
+            const max = parseInt(eventSelect.options[eventSelect.selectedIndex].getAttribute('data-max'));
+            if (membersList.children.length + 1 >= max) return;
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            div.innerHTML = `<input type="text" name="member_names[]" placeholder="Member Name" required class="flex-1 rounded-xl px-5 py-3 text-sm">`;
+            membersList.appendChild(div);
+            updatePrice();
+        });
 
         proceedBtn.addEventListener('click', () => {
             if (regForm.checkValidity()) {
@@ -498,50 +427,29 @@
             }
         });
 
-        closeModal.addEventListener('click', () => {
-            paymentModal.classList.remove('active');
-        });
+        closeModal.addEventListener('click', () => paymentModal.classList.remove('active'));
 
-        // Redirect to UPI App Logic
         payViaUpiBtn.addEventListener('click', () => {
-            const memberCount = membersList.children.length + 1;
-            const selected = eventSelect.options[eventSelect.selectedIndex];
-            const eventTitle = selected ? selected.getAttribute('data-title') : 'Reg';
-            const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
-            
             const upiId = "9172743746@ptaxis";
-            const payeeName = "NAYANGAVLI";
-            const upiIntent = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${pricing.price}&tn=${encodeURIComponent("TF2-" + eventTitle)}&cu=INR`;
-            
-            // Log intent trigger
-            console.log("Launching UPI Intent: " + upiIntent);
-            
-            // UI Feedback
-            autoVerifyStatus.classList.remove('hidden');
-            payViaUpiBtn.innerText = "Check App for Request";
-            payViaUpiBtn.classList.replace('bg-primary', 'bg-white/10');
-            payViaUpiBtn.classList.add('text-white');
-            
-            // Redirect
-            window.location.href = upiIntent;
+            const amount = document.getElementById('modal_amount').innerText.replace('₹', '');
+            const intent = `upi://pay?pa=${upiId}&pn=NAYANGAVLI&am=${amount}&cu=INR`;
+            window.location.href = intent;
         });
 
-        // --- FINAL SUBMISSION ---
+        // --- FINAL SUBMISSION SYNCED WITH BACKEND ---
         finalSubmitBtn.addEventListener('click', async () => {
             const utr = transactionIdInput.value.trim();
-            const userUpi = userUpiIdInput.value.trim();
-
             if (utr.length < 8) {
-                showMsg("Please enter the 12-digit UTR from your app history", "error");
+                showMsg("Please enter a valid Transaction UTR number", "error");
                 return;
             }
 
             finalSubmitBtn.disabled = true;
-            finalSubmitBtn.innerText = "Verifying Transaction...";
+            finalSubmitBtn.innerText = "Processing...";
 
             const formData = new FormData(regForm);
-            formData.append('transaction_id', utr);
-            formData.append('payer_upi_id', userUpi);
+            // FETCH THE TRANSACTION UTR IN 'utr' FIELD TO MATCH registrations.php
+            formData.append('utr', utr); 
 
             try {
                 const response = await fetch('registrations.php', {
@@ -552,18 +460,15 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    showMsg("Automatic Verification Complete! Welcome to Techfest.", "success");
+                    showMsg(result.message, "success");
                     regForm.reset();
-                    transactionIdInput.value = "";
-                    userUpiIdInput.value = "";
-                    membersList.innerHTML = '';
                     paymentModal.classList.remove('active');
-                    autoVerifyStatus.classList.add('hidden');
+                    membersList.innerHTML = '';
                 } else {
-                    showMsg("Verification Failed: " + result.message, "error");
+                    showMsg(result.message, "error");
                 }
             } catch (error) {
-                showMsg("Gateway Timeout. Your data is saved; we will verify manually.", "error");
+                showMsg("Connection lost. Please contact support.", "error");
             } finally {
                 finalSubmitBtn.disabled = false;
                 finalSubmitBtn.innerText = "Finish & Secure Slot";
@@ -577,32 +482,11 @@
             setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
         }
 
-        window.onload = () => {
-            initThree();
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('event');
-            if (eventId) {
-                eventSelect.value = eventId;
-                eventSelect.dispatchEvent(new Event('change'));
-            }
-        };
-
+        window.onload = initThree;
+        
         const themeBtn = document.getElementById('theme-btn');
         themeBtn.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            if (coreMesh) coreMesh.material.color.setHex(isLight ? 0x4f46e5 : 0x00f2ff);
-            document.getElementById('theme-path').setAttribute('d', isLight ?
-                "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" :
-                "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z");
-        });
-
-        window.addEventListener('resize', () => {
-            if (camera && renderer) {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            }
         });
     </script>
 </body>
