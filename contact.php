@@ -9,7 +9,7 @@
 ob_start();
 header('Content-Type: application/json');
 
-// 1. Database Configuration (Default for XAMPP/WAMP)
+// 1. Database Configuration (Using credentials consistent with your other handlers)
 $host = 'localhost';
 $db_name = 'techfest_db';
 $username = 'techfest_user';
@@ -17,7 +17,7 @@ $password = 'StrongPassword123';
 
 try {
     // 2. Establish Database Connection using PDO
-    $conn = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
+    $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // 3. Process the POST Request
@@ -34,7 +34,7 @@ try {
             ob_clean();
             echo json_encode([
                 'status' => 'error', 
-                'message' => 'Transmission failed: All fields are required.'
+                'message' => 'Transmission failed: All fields (Name, Email, Subject, Message) are required.'
             ]);
             exit;
         }
@@ -49,9 +49,9 @@ try {
         }
 
         // 4. Prepare and Execute SQL Statement
-        // Columns: name, email, subject, message (id and created_at are automatic)
-        $sql = "INSERT INTO queries (name, email, subject, message) 
-                VALUES (:name, :email, :subject, :message)";
+        // Ensure you have created a table named 'queries' in your database
+        $sql = "INSERT INTO queries (name, email, subject, message, created_at) 
+                VALUES (:name, :email, :subject, :message, NOW())";
         
         $stmt = $conn->prepare($sql);
 
@@ -65,13 +65,13 @@ try {
             ob_clean();
             echo json_encode([
                 'status' => 'success', 
-                'message' => 'Data successfully synced with the master server.'
+                'message' => 'Your query has been successfully synced with our master server. We will get back to you soon!'
             ]);
         } else {
             ob_clean();
             echo json_encode([
                 'status' => 'error', 
-                'message' => 'Database execution failed.'
+                'message' => 'Database execution failed. Please try again later.'
             ]);
         }
 
