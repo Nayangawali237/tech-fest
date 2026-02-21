@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
+
 $host = 'localhost'; // MariaDB on EC2
 $db_name = 'techfest_db';
 $username = 'techfest_user';
