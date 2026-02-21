@@ -161,6 +161,8 @@
             z-index: 1000;
             display: none;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            min-width: 280px;
         }
 
         .modal-overlay {
@@ -192,15 +194,6 @@
         .modal-overlay.active .modal-content {
             transform: translateY(0);
             opacity: 1;
-        }
-
-        .verifying-pulse {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; color: var(--primary); }
-            100% { opacity: 0.6; }
         }
     </style>
 </head>
@@ -237,17 +230,20 @@
 
             <div class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl">
                 <form id="regForm" class="space-y-8">
+                    <!-- Hidden field to satisfy PHP expectations -->
+                    <input type="hidden" name="category" value="General">
+
                     <div>
                         <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Target Event</label>
                         <select name="event_name" id="event_name" required class="w-full rounded-xl px-5 py-4">
                             <option value="" disabled selected>Select an event...</option>
-                            <option value="expo" data-title="Project Expo" data-type="team" data-max="4">Project Expo (₹199/person)</option>
-                            <option value="cad" data-title="CAD Competition" data-type="solo" data-max="1">CAD Competition (₹199)</option>
-                            <option value="code" data-title="Code Competition" data-type="solo" data-max="1">Code Competition (₹199)</option>
-                            <option value="robo" data-title="Robo Race" data-type="team" data-max="4">Robo Race (₹199/person)</option>
-                            <option value="poster" data-title="Poster Competition" data-type="team" data-max="4">Poster Competition (₹199/person)</option>
-                            <option value="startup" data-title="Startup Pitch" data-type="team" data-max="4">Startup Pitch (₹199/person)</option>
-                            <option value="tower" data-title="Tower Challenge" data-type="team" data-max="4">Tower Challenge (₹199/person)</option>
+                            <option value="Project Expo" data-title="Project Expo" data-type="team" data-max="4">Project Expo (₹199/person)</option>
+                            <option value="CAD Competition" data-title="CAD Competition" data-type="solo" data-max="1">CAD Competition (₹199)</option>
+                            <option value="Code Competition" data-title="Code Competition" data-type="solo" data-max="1">Code Competition (₹199)</option>
+                            <option value="Robo Race" data-title="Robo Race" data-type="team" data-max="4">Robo Race (₹199/person)</option>
+                            <option value="Poster Competition" data-title="Poster Competition" data-type="team" data-max="4">Poster Competition (₹199/person)</option>
+                            <option value="Startup Pitch" data-title="Startup Pitch" data-type="team" data-max="4">Startup Pitch (₹199/person)</option>
+                            <option value="Tower Challenge" data-title="Tower Challenge" data-type="team" data-max="4">Tower Challenge (₹199/person)</option>
                         </select>
                     </div>
 
@@ -258,7 +254,7 @@
                         </div>
                         <div id="members_container" class="space-y-4">
                             <div class="flex justify-between items-center">
-                                <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Team Members</label>
+                                <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Team Members (Max 4 more)</label>
                                 <button type="button" id="add_member_btn" class="text-[9px] font-black bg-primary/10 text-primary border border-primary/20 px-4 py-2 rounded-full hover:bg-primary hover:text-black transition-all">
                                     + Add Member
                                 </button>
@@ -275,7 +271,7 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <input type="email" name="lead_email" placeholder="Email Address" required class="w-full rounded-xl px-5 py-4">
-                            <input type="text" name="college" placeholder="College Name" required class="w-full rounded-xl px-5 py-4">
+                            <input type="text" name="college" placeholder="College Name" value="Sanjivani College of Engineering" required class="w-full rounded-xl px-5 py-4">
                         </div>
                     </div>
 
@@ -303,31 +299,32 @@
                     </div>
                 </div>
 
-                <div class="space-y-6">
+                <div class="space-y-4">
                     <div class="space-y-3">
                         <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Scan QR to Pay</h3>
-                        <div class="bg-white p-3 rounded-xl inline-block mx-auto">
-                            <img id="payment_qr_img" src="" alt="QR" class="w-44 h-44 object-contain">
+                        <div class="bg-white p-3 rounded-xl inline-block mx-auto border-2 border-primary/20">
+                            <img id="payment_qr_img" src="" alt="Payment QR" class="w-44 h-44 object-contain">
                         </div>
                     </div>
 
                     <div class="space-y-4 pt-4 border-t border-white/10">
                         <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Receive UPI Request</h3>
-                        <div class="space-y-2">
-                            <input type="text" id="user_upi_id" placeholder="Enter UPI ID (e.g. name@upi)" class="w-full rounded-xl px-4 py-4 text-sm font-mono text-center">
-                            <button type="button" id="pay_via_upi_btn" class="bg-primary text-black font-black text-[10px] uppercase tracking-widest px-6 py-4 rounded-xl w-full">
+                        <div class="space-y-3">
+                            <input type="text" id="user_upi_id" placeholder="Enter your UPI ID (Optional)" class="w-full rounded-xl px-4 py-4 text-sm font-mono text-center border border-primary/10">
+                            <button type="button" id="pay_via_upi_btn" class="bg-primary text-black font-black text-[10px] uppercase tracking-widest px-6 py-4 rounded-xl w-full hover:scale-[1.02] transition-transform">
                                 Launch Payment Request
                             </button>
+                            <p class="text-[9px] opacity-60">Redirects to your UPI app for secure payment.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- UTR Input Section -->
-                <div class="space-y-4 pt-6 border-t border-white/10">
+                <div class="space-y-4 pt-6 border-t border-white/10 text-left">
                     <div class="space-y-3">
-                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary text-left">Confirm Transaction UTR (12-Digits)</label>
-                        <input type="text" id="transaction_id" placeholder="Enter UTR Number" required class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center">
-                        <p class="text-[9px] opacity-60 italic">Check your transaction history for the 12-digit UTR/Ref number.</p>
+                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Confirm Transaction UTR (12-Digits)</label>
+                        <input type="text" id="transaction_id" maxlength="12" placeholder="Enter 12-Digit UTR" class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center border border-primary/30">
+                        <p class="text-[9px] opacity-60 italic text-center">Required to auto-verify your slot instantly.</p>
                     </div>
                 </div>
 
@@ -341,25 +338,35 @@
     <div id="status-msg"></div>
 
     <script>
-        // --- THREE.JS ---
+        // --- THREE.JS BACKGROUND ---
         let scene, camera, renderer, coreMesh;
         function initThree() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 5;
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
-            const geometry = new THREE.IcosahedronGeometry(2, 1);
+            
+            const geometry = new THREE.IcosahedronGeometry(2.5, 1);
             const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
             coreMesh = new THREE.Mesh(geometry, material);
             scene.add(coreMesh);
+            
             animate();
         }
+
         function animate() {
             requestAnimationFrame(animate);
-            if (coreMesh) coreMesh.rotation.y += 0.001;
+            if (coreMesh) coreMesh.rotation.y += 0.002;
             renderer.render(scene, camera);
         }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
         // --- FORM LOGIC ---
         const eventSelect = document.getElementById('event_name');
@@ -373,15 +380,16 @@
         const closeModal = document.getElementById('closeModal');
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
         const transactionIdInput = document.getElementById('transaction_id');
-        const userUpiIdInput = document.getElementById('user_upi_id');
         const paymentQrImg = document.getElementById('payment_qr_img');
         const payViaUpiBtn = document.getElementById('pay_via_upi_btn');
 
+        // Dynamic QR Assets Mapping
         const PRICING_MAP = {
             1: { price: 199, qr: "https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/199.png" },
             2: { price: 398, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/399.jpeg" },
             3: { price: 597, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/599.jpeg" },
-            4: { price: 796, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" }
+            4: { price: 796, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" },
+            5: { price: 995, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" } // Fallback
         };
 
         function updatePrice() {
@@ -401,20 +409,32 @@
             const type = selected.getAttribute('data-type');
             if (type === 'team') {
                 teamInfoGroup.classList.remove('hidden');
+                document.getElementById('team_name').required = true;
             } else {
                 teamInfoGroup.classList.add('hidden');
+                document.getElementById('team_name').required = false;
                 membersList.innerHTML = '';
             }
             updatePrice();
         });
 
         addMemberBtn.addEventListener('click', () => {
-            const max = parseInt(eventSelect.options[eventSelect.selectedIndex].getAttribute('data-max'));
-            if (membersList.children.length + 1 >= max) return;
+            const selected = eventSelect.options[eventSelect.selectedIndex];
+            const maxAllowedMembers = parseInt(selected.getAttribute('data-max')); // This is the limit for additional members
+            
+            if (membersList.children.length >= maxAllowedMembers) {
+                showMsg(`Max ${maxAllowedMembers} additional members allowed for this event`, "error");
+                return;
+            }
+
             const div = document.createElement('div');
-            div.className = 'flex gap-2';
-            div.innerHTML = `<input type="text" name="member_names[]" placeholder="Member Name" required class="flex-1 rounded-xl px-5 py-3 text-sm">`;
+            div.className = 'flex gap-2 animate-pulse';
+            div.innerHTML = `
+                <input type="text" name="member_names[]" placeholder="Full Name" required class="flex-1 rounded-xl px-5 py-3 text-sm">
+                <button type="button" class="px-3 text-red-500 hover:bg-red-500/10 rounded-xl" onclick="this.parentElement.remove(); updatePrice();">✕</button>
+            `;
             membersList.appendChild(div);
+            setTimeout(() => div.classList.remove('animate-pulse'), 500);
             updatePrice();
         });
 
@@ -429,27 +449,33 @@
 
         closeModal.addEventListener('click', () => paymentModal.classList.remove('active'));
 
+        // --- UPI DEEP LINK REDIRECT ---
         payViaUpiBtn.addEventListener('click', () => {
-            const upiId = "9172743746@ptaxis";
+            const merchantVpa = "mab.037322028260133@axisbank";
             const amount = document.getElementById('modal_amount').innerText.replace('₹', '');
-            const intent = `upi://pay?pa=${upiId}&pn=NAYANGAVLI&am=${amount}&cu=INR`;
+            const eventName = eventSelect.options[eventSelect.selectedIndex]?.getAttribute('data-title') || "Techfest";
+            
+            // Generate standard UPI Payment Intent URL
+            const intent = `upi://pay?pa=${merchantVpa}&pn=TECHFEST_2_0&am=${amount}&cu=INR&tn=Reg_${eventName.replace(/\s+/g, '_')}`;
+            
+            // Redirect to trigger UPI apps on mobile
             window.location.href = intent;
         });
 
-        // --- FINAL SUBMISSION SYNCED WITH BACKEND ---
+        // --- SUBMISSION HANDLER ---
         finalSubmitBtn.addEventListener('click', async () => {
             const utr = transactionIdInput.value.trim();
-            if (utr.length < 8) {
-                showMsg("Please enter a valid Transaction UTR number", "error");
+            
+            if (utr.length < 10) {
+                showMsg("Please enter a valid 12-digit UTR number", "error");
                 return;
             }
 
             finalSubmitBtn.disabled = true;
-            finalSubmitBtn.innerText = "Processing...";
+            finalSubmitBtn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Validating...`;
 
             const formData = new FormData(regForm);
-            // FETCH THE TRANSACTION UTR IN 'utr' FIELD TO MATCH registrations.php
-            formData.append('utr', utr); 
+            formData.append('utr', utr); // Explicitly bind utr key
 
             try {
                 const response = await fetch('registrations.php', {
@@ -464,11 +490,12 @@
                     regForm.reset();
                     paymentModal.classList.remove('active');
                     membersList.innerHTML = '';
+                    setTimeout(() => location.reload(), 3000);
                 } else {
                     showMsg(result.message, "error");
                 }
             } catch (error) {
-                showMsg("Connection lost. Please contact support.", "error");
+                showMsg("Network error. Please try again or contact support.", "error");
             } finally {
                 finalSubmitBtn.disabled = false;
                 finalSubmitBtn.innerText = "Finish & Secure Slot";
@@ -477,17 +504,18 @@
 
         function showMsg(text, type) {
             statusMsg.innerText = text;
-            statusMsg.style.background = type === 'success' ? "rgba(16, 185, 129, 0.9)" : "rgba(239, 68, 68, 0.9)";
+            statusMsg.style.background = type === 'success' ? "rgba(16, 185, 129, 0.95)" : "rgba(239, 68, 68, 0.95)";
             statusMsg.style.display = 'block';
             setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
         }
 
-        window.onload = initThree;
-        
+        // --- THEME ---
         const themeBtn = document.getElementById('theme-btn');
         themeBtn.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
         });
+
+        window.onload = initThree;
     </script>
 </body>
 </html>
