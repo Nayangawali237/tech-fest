@@ -9,9 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #00f2ff;
@@ -55,27 +53,11 @@
             position: relative;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        .font-tech {
+        h1, h2, h3, h4, h5, .font-tech {
             font-family: 'Orbitron', sans-serif;
             letter-spacing: -0.02em;
         }
 
-        .dynamic-text {
-            color: var(--text-main);
-            transition: color 0.5s ease;
-        }
-
-        .dynamic-dim {
-            color: var(--text-dim);
-            transition: color 0.5s ease;
-        }
-
-        /* FIX: Layering Hierarchy */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -131,13 +113,8 @@
             position: relative;
             display: flex;
             align-items: center;
-            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5),
-                0 5px 15px -5px rgba(0, 0, 0, 0.2);
-            transition: box-shadow 0.4s ease, background 0.5s ease, border 0.5s ease;
-        }
-
-        body.light-mode .nav-float {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s ease;
         }
 
         .nav-links-container {
@@ -171,7 +148,6 @@
             position: absolute;
             height: calc(100% - 8px);
             top: 4px;
-            left: 4px;
             background: var(--primary);
             border-radius: 40px;
             z-index: 0;
@@ -192,31 +168,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-left: 1rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
         }
 
-        .theme-toggle:hover {
-            border-color: var(--primary);
-            box-shadow: 0 15px 25px -5px rgba(0, 242, 255, 0.15);
-            transform: scale(1.05);
-        }
-
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2.5px;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.light-mode .theme-toggle svg {
-            transform: rotate(360deg);
-        }
-
-        /* Hero Text and Spacing */
+        /* --- HERO --- */
         .hero-title-main {
-            font-size: clamp(3.5rem, 12vw, 10rem);
+            font-size: clamp(3rem, 10vw, 8rem);
             line-height: 0.85;
             font-weight: 900;
             text-transform: uppercase;
@@ -227,37 +183,11 @@
         .outline-text {
             -webkit-text-stroke: 1px var(--text-dim);
             color: transparent;
-            transition: -webkit-text-stroke 0.5s ease;
         }
 
         .glow-cyan {
             color: var(--primary);
             text-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
-            transition: color 0.5s ease, text-shadow 0.5s ease;
-        }
-
-        body.light-mode .glow-cyan {
-            text-shadow: 0 0 30px rgba(79, 70, 229, 0.2);
-        }
-
-        @keyframes floatLogo {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-15px) rotate(2deg);
-            }
-        }
-
-        .floating-logo-card {
-            animation: floatLogo 4s ease-in-out infinite;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            transition: 0.4s;
         }
 
         .btn-apply {
@@ -271,7 +201,6 @@
             transform: scale(1.05);
             background: var(--primary);
             color: #000;
-            box-shadow: 0 15px 30px -5px rgba(0, 242, 255, 0.2);
         }
 
         body.light-mode .btn-apply:hover {
@@ -279,24 +208,17 @@
         }
 
         .event-card-v2 {
-            position: relative;
             background: var(--card-bg);
             border: 1px solid var(--border);
             padding: 40px;
             border-radius: 12px;
             transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1);
-            overflow: hidden;
             backdrop-filter: blur(12px);
-            z-index: 1;
         }
 
         .event-card-v2:hover {
             border-color: var(--primary);
             transform: translateY(-10px);
-        }
-
-        body.light-mode .event-card-v2 {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .stat-card-modern {
@@ -309,11 +231,6 @@
 
         .stat-card-modern:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-        }
-
-        body.light-mode .stat-card-modern {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
         }
 
         .scroll-indicator {
@@ -325,7 +242,6 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            z-index: 5;
         }
 
         .scroll-line {
@@ -334,10 +250,42 @@
             background: linear-gradient(to bottom, var(--primary), transparent);
         }
 
-        section {
-            position: relative;
-            z-index: 10;
+        /* --- SPONSOR CARD --- */
+        .sponsor-card-v2 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            transition: 0.4s;
+            cursor: pointer;
         }
+
+        .sponsor-card-v2:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .sponsor-logo-img {
+            max-width: 220px;
+            filter: grayscale(1) brightness(1.5);
+            transition: 0.4s;
+        }
+
+        .sponsor-card-v2:hover .sponsor-logo-img {
+            filter: grayscale(0) brightness(1);
+        }
+
+        body.light-mode .sponsor-logo-img {
+            filter: grayscale(1) contrast(0.5);
+        }
+
+        .dynamic-text { color: var(--text-main); }
+        .dynamic-dim { color: var(--text-dim); }
+
+        html { scroll-behavior: smooth; }
     </style>
 </head>
 
@@ -350,10 +298,8 @@
     <header class="fixed top-8 left-0 w-full z-[100] px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="logo">
-                <a href="index.html" class="flex items-center gap-2 group">
-                    <span
-                        class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
-                        2.0</span>
+                <a href="#" class="flex items-center gap-2 group">
+                    <span class="text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
                 </a>
             </div>
 
@@ -361,34 +307,26 @@
                 <div class="nav-float hidden xl:flex">
                     <div class="nav-indicator" id="nav-indicator"></div>
                     <div class="nav-links-container" id="nav-container">
-                        <a href="index.html" class="nav-link active">Home</a>
-                        <a href="events.html" class="nav-link">Events</a>
-                        <a href="registrations.html" class="nav-link">Register</a>
-                        <a href="accommodation.html" class="nav-link">Stay</a>
-                        <a href="team.html" class="nav-link">Team</a>
-                        <a href="sponsors.html" class="nav-link">Sponsors</a>
-                        <a href="about.html" class="nav-link">About</a>
-                        <a href="contact.html" class="nav-link">Contact</a>
+                        <a href="#" class="nav-link active">Home</a>
+                        <a href="#events" class="nav-link">Events</a>
+                        <a href="#register" class="nav-link">Register</a>
+                        <a href="#about" class="nav-link">About</a>
+                        <a href="#sponsors" class="nav-link">Sponsors</a>
+                        <a href="#contact" class="nav-link">Contact</a>
                     </div>
                 </div>
 
                 <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
-                    <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg id="sun-icon" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    <svg id="moon-icon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
             </div>
 
-            <a href="registrations.html"
-                class="btn-apply hidden md:block text-[10px] uppercase font-black px-8 py-3.5 rounded-full">Register
-                Now</a>
+            <a href="#register" class="btn-apply hidden md:block text-[10px] uppercase font-black px-8 py-3.5 rounded-full">Register Now</a>
         </div>
     </header>
 
@@ -397,8 +335,7 @@
         <div class="container relative px-6 mx-auto">
             <div class="flex flex-col lg:flex-row items-center lg:items-end gap-12 lg:gap-16">
                 <div class="reveal active w-full lg:w-auto text-center lg:text-left">
-                    <span
-                        class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-cyan-400 mb-8 bg-cyan-400/5">
+                    <span class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-cyan-400 mb-8 bg-cyan-400/5">
                         24 / MARCH / 2026
                     </span>
                     <h1 class="hero-title-main">
@@ -407,59 +344,42 @@
                         <span class="block glow-cyan">2.0</span>
                     </h1>
                 </div>
-                <div class="lg:mb-16 max-w-sm reveal active text-center lg:text-left" style="transition-delay: 0.2s;">
+                <div class="lg:mb-16 max-w-sm reveal active text-center lg:text-left">
                     <p class="dynamic-dim text-lg leading-relaxed mb-10 font-light">
                         Where Innovation Meets Excellence. Join 5000+ innovators at India's premier technical festival.
                     </p>
-                    <div id="countdown" class="flex justify-right lg:justify-start gap-6 md:gap-8">
-                        <div class="text-center"><span id="days"
-                                class="block text-3xl font-black dynamic-text">00</span><span
-                                class="text-[9px] uppercase tracking-widest dynamic-dim">Days</span></div>
-                        <div class="text-center"><span id="hours"
-                                class="block text-3xl font-black dynamic-text">00</span><span
-                                class="text-[9px] uppercase tracking-widest dynamic-dim">Hrs</span></div>
-                        <div class="text-center"><span id="minutes"
-                                class="block text-3xl font-black dynamic-text">00</span><span
-                                class="text-[9px] uppercase tracking-widest dynamic-dim">Min</span></div>
-                        <div class="text-center"><span id="seconds"
-                                class="block text-3xl font-black dynamic-text text-primary">00</span><span
-                                class="text-[9px] uppercase tracking-widest text-primary">Sec</span></div>
+                    <div id="countdown" class="flex justify-center lg:justify-start gap-6 md:gap-8">
+                        <div class="text-center"><span id="days" class="block text-3xl font-black dynamic-text">00</span><span class="text-[9px] uppercase tracking-widest dynamic-dim">Days</span></div>
+                        <div class="text-center"><span id="hours" class="block text-3xl font-black dynamic-text">00</span><span class="text-[9px] uppercase tracking-widest dynamic-dim">Hrs</span></div>
+                        <div class="text-center"><span id="minutes" class="block text-3xl font-black dynamic-text">00</span><span class="text-[9px] uppercase tracking-widest dynamic-dim">Min</span></div>
+                        <div class="text-center"><span id="seconds" class="block text-3xl font-black dynamic-text text-primary">00</span><span class="text-[9px] uppercase tracking-widest text-primary">Sec</span></div>
                     </div>
                     <div class="mt-12 flex flex-wrap justify-center lg:justify-start gap-4">
-                        <a href="registrations.html"
-                            class="btn-apply text-[10px] uppercase font-black px-8 py-4 rounded-full">Apply Now</a>
-                        <a href="#events"
-                            class="px-8 py-4 rounded-full border border-border text-[10px] uppercase font-black dynamic-text hover:border-primary transition-all">Explore
-                            Events</a>
+                        <a href="#register" class="btn-apply text-[10px] uppercase font-black px-8 py-4 rounded-full">Apply Now</a>
+                        <a href="#events" class="px-8 py-4 rounded-full border border-border text-[10px] uppercase font-black dynamic-text hover:border-primary transition-all">Explore Events</a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="scroll-indicator reveal">
+        <div class="scroll-indicator reveal active">
             <span class="text-[9px] uppercase tracking-[0.4em] dynamic-dim">Scroll</span>
             <div class="scroll-line"></div>
         </div>
     </section>
 
     <!-- About Section -->
-    <section class="py-40 relative border-y border-white/5 bg-black/5 backdrop-blur-sm">
+    <section id="about" class="py-40 relative border-y border-white/5 bg-black/5 backdrop-blur-sm">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div class="reveal">
-                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">The Hub of
-                    Innovation</span>
-                <h2 class="text-6xl font-black mt-6 mb-10 tracking-tight leading-none dynamic-text">The Future
-                    <br>Starts Here
-                </h2>
+                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">The Hub of Innovation</span>
+                <h2 class="text-5xl font-black mt-6 mb-10 tracking-tight leading-tight dynamic-text">The Future Starts Here</h2>
                 <div class="space-y-6 dynamic-dim text-lg font-light leading-relaxed">
-                    <p>Techfest 2.0 is the flagship technical festival of the Indian Society for Technical Education
-                        (ISTE), bringing together the brightest minds from across the nation.</p>
-                    <p>For three electrifying days, we transform our campus into a hub of innovation, creativity, and
-                        technological excellence.</p>
-                    <p>With cutting-edge competitions, interactive workshops, inspiring guest lectures, and countless
-                        networking opportunities, Techfest 2.0 is where ideas come to life.</p>
+                    <p>Techfest 2.0 is the flagship technical festival of the Indian Society for Technical Education (ISTE), bringing together the brightest minds from across the nation.</p>
+                    <p>For three electrifying days, we transform our campus into a hub of innovation, creativity, and technological excellence.</p>
+                    <p>With cutting-edge competitions, interactive workshops, and countless networking opportunities, Techfest 2.0 is where ideas come to life.</p>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-6 reveal" style="transition-delay: 0.2s;">
+            <div class="grid grid-cols-2 gap-6 reveal">
                 <div class="stat-card-modern text-center">
                     <div class="text-3xl mb-4">💰</div>
                     <div class="text-4xl font-black text-primary">₹2.0L+</div>
@@ -484,45 +404,39 @@
         </div>
     </section>
 
-    <!-- Highlights Grid -->
+    <!-- Highlights Grid (Restored Feature) -->
     <section class="py-40 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-24 reveal">
                 <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Why Techfest 2.0</span>
-                <h2 class="text-6xl md:text-8xl font-black mt-6 tracking-tighter dynamic-text">Experience the
-                    <br>Extraordinary
-                </h2>
+                <h2 class="text-6xl md:text-7xl font-black mt-6 tracking-tighter dynamic-text">Experience the Extraordinary</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="event-card-v2 reveal">
                     <div class="text-4xl font-black text-primary/20 mb-6 font-tech">01</div>
                     <h3 class="text-2xl font-black mb-4 dynamic-text">Technical Excellence</h3>
-                    <p class="dynamic-dim font-light text-sm leading-relaxed">Compete in cutting-edge technical events
-                        covering AI, robotics, coding, and more.</p>
+                    <p class="dynamic-dim font-light text-sm leading-relaxed">Compete in cutting-edge technical events covering AI, robotics, coding, and more.</p>
                 </div>
-                <div class="event-card-v2 reveal" style="transition-delay: 0.1s;">
+                <div class="event-card-v2 reveal">
                     <div class="text-4xl font-black text-primary/20 mb-6 font-tech">02</div>
                     <h3 class="text-2xl font-black mb-4 dynamic-text">Industry Exposure</h3>
-                    <p class="dynamic-dim font-light text-sm leading-relaxed">Network with industry leaders, recruiters,
-                        and innovators shaping tomorrow.</p>
+                    <p class="dynamic-dim font-light text-sm leading-relaxed">Network with industry leaders, recruiters, and innovators shaping tomorrow.</p>
                 </div>
-                <div class="event-card-v2 reveal" style="transition-delay: 0.2s;">
+                <div class="event-card-v2 reveal">
                     <div class="text-4xl font-black text-primary/20 mb-6 font-tech">03</div>
                     <h3 class="text-2xl font-black mb-4 dynamic-text">Massive Prize Pool</h3>
-                    <p class="dynamic-dim font-light text-sm leading-relaxed">Win from a prize pool exceeding ₹50 lakhs
-                        across all our major competitions.</p>
+                    <p class="dynamic-dim font-light text-sm leading-relaxed">Win from a prize pool exceeding lakhs across all our major competitions.</p>
                 </div>
-                <div class="event-card-v2 reveal" style="transition-delay: 0.3s;">
+                <div class="event-card-v2 reveal">
                     <div class="text-4xl font-black text-primary/20 mb-6 font-tech">04</div>
                     <h3 class="text-2xl font-black mb-4 dynamic-text">Learn & Grow</h3>
-                    <p class="dynamic-dim font-light text-sm leading-relaxed">Attend workshops and talks by renowned
-                        experts in various tech domains.</p>
+                    <p class="dynamic-dim font-light text-sm leading-relaxed">Attend workshops and talks by renowned experts in various tech domains.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Featured Events Section -->
+    <!-- Featured Events Section (Restored full 4 cards) -->
     <section id="events" class="py-40 relative border-t border-white/5">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8 reveal">
@@ -530,55 +444,41 @@
                     <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Featured Events</span>
                     <h2 class="text-6xl font-black mt-6 tracking-tighter dynamic-text">Signature <br>Competitions</h2>
                 </div>
-                <a href="events.html"
-                    class="px-10 py-4 rounded-full bg-primary text-black text-[10px] uppercase font-black hover:scale-105 transition-transform">View
-                    All Events</a>
+                <a href="#register" class="px-10 py-4 rounded-full bg-primary text-black text-[10px] uppercase font-black hover:scale-105 transition-transform">View All Events</a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Event Card 1 -->
                 <div class="event-card-v2 reveal">
-                    <span
-                        class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Technical</span>
+                    <span class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Technical</span>
                     <h3 class="text-2xl font-black mb-3 dynamic-text">CodeWars</h3>
-                    <p class="dynamic-dim text-sm font-light mb-8">48-hour coding marathon to build innovative solutions
-                        for real-world issues.</p>
+                    <p class="dynamic-dim text-sm font-light mb-8">48-hour coding marathon to build innovative solutions for real-world issues.</p>
                     <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                         <span class="text-primary">₹10,000</span>
                         <span class="dynamic-dim">solo</span>
                     </div>
                 </div>
-                <!-- Event Card 2 -->
-                <div class="event-card-v2 reveal" style="transition-delay: 0.1s;">
-                    <span
-                        class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Robotics</span>
+                <div class="event-card-v2 reveal">
+                    <span class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Robotics</span>
                     <h3 class="text-2xl font-black mb-3 dynamic-text">RoboRace</h3>
-                    <p class="dynamic-dim text-sm font-light mb-8">Build and battle autonomous robots in epic arena
-                        challenges and obstacle courses.</p>
+                    <p class="dynamic-dim text-sm font-light mb-8">Build and battle autonomous robots in epic arena challenges and obstacle courses.</p>
                     <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                         <span class="text-primary">₹30,000</span>
                         <span class="dynamic-dim">Team of 4</span>
                     </div>
                 </div>
-                <!-- Event Card 3 -->
-                <div class="event-card-v2 reveal" style="transition-delay: 0.2s;">
-                    <span
-                        class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Technical</span>
+                <div class="event-card-v2 reveal">
+                    <span class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Technical</span>
                     <h3 class="text-2xl font-black mb-3 dynamic-text">Project Expo</h3>
-                    <p class="dynamic-dim text-sm font-light mb-8">Solve complex problems using Projects,
-                        expo and data .</p>
+                    <p class="dynamic-dim text-sm font-light mb-8">Display your engineering projects and innovative hardware solutions.</p>
                     <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                         <span class="text-primary">₹90,000</span>
                         <span class="dynamic-dim">Team of 4</span>
                     </div>
                 </div>
-                <!-- Event Card 4 -->
-                <div class="event-card-v2 reveal" style="transition-delay: 0.3s;">
-                    <span
-                        class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Business</span>
+                <div class="event-card-v2 reveal">
+                    <span class="inline-block px-3 py-1 rounded bg-primary/10 text-primary text-[9px] uppercase font-bold mb-6">Business</span>
                     <h3 class="text-2xl font-black mb-3 dynamic-text">Launchpad</h3>
-                    <p class="dynamic-dim text-sm font-light mb-8">Present your revolutionary startup idea to industry
-                        experts and venture investors.</p>
+                    <p class="dynamic-dim text-sm font-light mb-8">Present your revolutionary startup idea to industry experts and venture investors.</p>
                     <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
                         <span class="text-primary">₹30,000</span>
                         <span class="dynamic-dim">Team of 4</span>
@@ -589,90 +489,69 @@
     </section>
 
     <!-- Partners Section -->
-    <section class="py-40 bg-black/20 border-t border-white/5 overflow-hidden">
+    <section id="sponsors" class="py-40 bg-black/20 border-t border-white/5 overflow-hidden">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-24 reveal">
                 <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Our Partners</span>
-                <h2 class="text-6xl md:text-8xl font-black mt-6 tracking-tighter dynamic-text">Powered By <br>Innovation
-                </h2>
+                <h2 class="text-6xl md:text-8xl font-black mt-6 tracking-tighter dynamic-text">Powered By <br>Innovation</h2>
             </div>
-
-              <section class="pb-24 px-6 relative z-10">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 gap-12 max-w-2xl mx-auto">
-                <!-- Tech Sponsor -->
-                <div class="reveal active">
-                    <a href="https://scdsanjivani.awscc.tech/" target="_blank" class="sponsor-card-v2 cursor-pointer">
-                        <img src="https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/AWSCC_Sanjivani.png" alt="AWS Cloud Club" class="sponsor-logo-img mb-6">
-                        <div class="text-center">
-                            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary block mb-2">Tech Sponsor</span>
-                            <p class="text-sm md:text-base font-semibold dynamic-text tracking-wide">
-                                AWS Cloud Club Sanjivani
-                            </p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+            <div class="max-w-2xl mx-auto reveal">
+                <a href="https://scdsanjivani.awscc.tech/" target="_blank" class="sponsor-card-v2 group">
+                    <img src="https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/AWSCC_Sanjivani.png" alt="AWS Cloud Club" class="sponsor-logo-img mb-6">
+                    <div class="text-center">
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary block mb-2">Tech Sponsor</span>
+                        <p class="text-base font-semibold dynamic-text tracking-wide">AWS Cloud Club Sanjivani</p>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-40 relative border-t border-white/5 overflow-hidden">
+    <!-- CTA Section (Restored) -->
+    <section id="register" class="py-40 relative border-t border-white/5 overflow-hidden">
         <div class="container mx-auto px-6 text-center reveal">
-            <h2 class="text-6xl md:text-8xl font-black tracking-tighter dynamic-text mb-8">Ready to Shape <br>the
-                Future?</h2>
-            <p class="dynamic-dim text-xl max-w-2xl mx-auto mb-12 font-light">Join thousands of innovators at Techfest
-                2.0. Register now and be part of something extraordinary.</p>
-            <a href="registrations.html"
-                class="inline-block px-12 py-5 rounded-full bg-primary text-black text-xs uppercase font-black hover:scale-110 transition-transform shadow-[0_0_30px_rgba(0,242,255,0.3)]">Register
-                for Techfest 2.0</a>
+            <h2 class="text-6xl md:text-8xl font-black tracking-tighter dynamic-text mb-8">Ready to Shape <br>the Future?</h2>
+            <p class="dynamic-dim text-xl max-w-2xl mx-auto mb-12 font-light">Join thousands of innovators at Techfest 2.0. Register now and be part of something extraordinary.</p>
+            <a href="#" class="inline-block px-12 py-5 rounded-full bg-primary text-black text-xs uppercase font-black hover:scale-110 transition-transform shadow-[0_0_30px_rgba(0,242,255,0.3)]">Register for Techfest 2.0</a>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-32 border-t border-white/5 px-6 bg-black backdrop-blur-md relative z-[20]">
+    <!-- Footer (Restored original columns) -->
+    <footer id="contact" class="py-32 border-t border-white/5 px-6 bg-black/50 backdrop-blur-md relative z-[20]">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
             <div class="lg:col-span-1">
                 <span class="text-3xl font-black font-tech tracking-tighter dynamic-text">Techfest 2.0</span>
-                <p class="dynamic-dim mt-8 text-sm font-light leading-relaxed">India's premier technical festival
-                    celebrating innovation, creativity, and technological excellence. Organized with passion by the ISTE
-                    Student Team.</p>
+                <p class="dynamic-dim mt-8 text-sm font-light leading-relaxed">India's premier technical festival celebrating innovation, creativity, and technological excellence. Organized with passion by the ISTE Student Team.</p>
                 <div class="flex gap-4 mt-8">
-                    <a href="#"
-                        class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">📸</a>
-                    <a href="#"
-                        class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">💼</a>
-                    <a href="#"
-                        class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">🐦</a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">📸</a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">💼</a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">🐦</a>
                 </div>
             </div>
             <div>
                 <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Quick Links</h5>
                 <ul class="space-y-4 dynamic-dim text-[11px] font-bold tracking-widest uppercase">
-                    <li><a href="index.html" class="hover:text-primary transition-colors">Home</a></li>
-                    <li><a href="events.html" class="hover:text-primary transition-colors">Events</a></li>
-                    <li><a href="registrations.html" class="hover:text-primary transition-colors">Register</a></li>
-                    <li><a href="accommodation.html" class="hover:text-primary transition-colors">Accommodation</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Home</a></li>
+                    <li><a href="#events" class="hover:text-primary transition-colors">Events</a></li>
+                    <li><a href="#register" class="hover:text-primary transition-colors">Register</a></li>
+                    <li><a href="#about" class="hover:text-primary transition-colors">About Us</a></li>
                 </ul>
             </div>
             <div>
-                <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Explore</h5>
+                <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Support</h5>
                 <ul class="space-y-4 dynamic-dim text-[11px] font-bold tracking-widest uppercase">
-                    <li><a href="team.html" class="hover:text-primary transition-colors">The Team</a></li>
-                    <li><a href="sponsors.html" class="hover:text-primary transition-colors">Sponsors</a></li>
-                    <li><a href="about.html" class="hover:text-primary transition-colors">About Us</a></li>
-                    <li><a href="contact.html" class="hover:text-primary transition-colors">Contact</a></li>
+                    <li><a href="#sponsors" class="hover:text-primary transition-colors">Sponsors</a></li>
+                    <li><a href="#contact" class="hover:text-primary transition-colors">Team</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">Accommodation</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">FAQs</a></li>
                 </ul>
             </div>
             <div>
                 <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Contact Us</h5>
                 <ul class="space-y-4 dynamic-dim text-xs font-light leading-loose">
-                    <li>📧 info@techfest.edu.in</li>
-                    <li>📞 +91 98765 43210</li>
-                    <li>📍 College of Engineering<br>Kopargaon, Maharashtra 423603</li>
+                    <li>📧 principalcoe@sanjivani.org.in</li>
+                    <li>📞 +91 9175811770</li>
+                    <li>📍 Sanjivani College of Engineering<br>Kopargaon, Maharashtra 423603</li>
                 </ul>
             </div>
         </div>
@@ -688,16 +567,19 @@
         const navLinks = document.querySelectorAll('.nav-link');
 
         function moveIndicator(element) {
+            if (!element || !navIndicator) return;
             const rect = element.getBoundingClientRect();
             const parentRect = navContainer.getBoundingClientRect();
             navIndicator.style.width = `${rect.width}px`;
-            navIndicator.style.left = `${rect.left - parentRect.left + 4}px`;
+            navIndicator.style.left = `${rect.left - parentRect.left}px`;
         }
 
-        const activeLink = document.querySelector('.nav-link.active');
-        if (activeLink) moveIndicator(activeLink);
-
         navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                moveIndicator(link);
+            });
             link.addEventListener('mouseenter', (e) => moveIndicator(e.target));
             link.addEventListener('mouseleave', () => {
                 const currentActive = document.querySelector('.nav-link.active');
@@ -719,16 +601,16 @@
                 alpha: true, antialias: true
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
             const geometry = new THREE.IcosahedronGeometry(2.5, 2);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15 });
+            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.12 });
             coreMesh = new THREE.Mesh(geometry, material);
             scene.add(coreMesh);
 
             const pointsGeom = new THREE.BufferGeometry();
-            const posArray = new Float32Array(1200 * 3);
-            for (let i = 0; i < 3600; i++) posArray[i] = (Math.random() - 0.5) * 15;
+            const posArray = new Float32Array(800 * 3);
+            for (let i = 0; i < 2400; i++) posArray[i] = (Math.random() - 0.5) * 15;
             pointsGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             particles = new THREE.Points(pointsGeom, new THREE.PointsMaterial({ size: 0.015, color: 0x00f2ff, transparent: true, opacity: 0.2 }));
             scene.add(particles);
@@ -738,7 +620,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            if (coreMesh) { coreMesh.rotation.y += 0.002; coreMesh.rotation.x += 0.001; }
+            if (coreMesh) { coreMesh.rotation.y += 0.001; coreMesh.rotation.x += 0.0005; }
             camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
             camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
@@ -755,9 +637,7 @@
             mouseX = (e.clientX / window.innerWidth) * 2 - 1;
             mouseY = (e.clientY / window.innerHeight) * 2 - 1;
             const cursor = document.querySelector('.cursor');
-            if (cursor) {
-                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
-            }
+            if (cursor) cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
         });
 
         // --- THEME LOGIC ---
@@ -768,19 +648,14 @@
         themeBtn.addEventListener('click', () => {
             document.body.classList.toggle('light-mode');
             const isLight = document.body.classList.contains('light-mode');
-
             if (isLight) { sunIcon.classList.remove('hidden'); moonIcon.classList.add('hidden'); }
             else { sunIcon.classList.add('hidden'); moonIcon.classList.remove('hidden'); }
 
             const color = isLight ? 0x4f46e5 : 0x00f2ff;
-            if (coreMesh) {
-                coreMesh.material.color.setHex(color);
-                coreMesh.material.opacity = isLight ? 0.08 : 0.15;
-            }
-            if (particles) {
-                particles.material.color.setHex(color);
-                particles.material.opacity = isLight ? 0.12 : 0.2;
-            }
+            if (coreMesh) coreMesh.material.color.setHex(color);
+            if (particles) particles.material.color.setHex(color);
+            const currentActive = document.querySelector('.nav-link.active');
+            if (currentActive) moveIndicator(currentActive);
         });
 
         const observer = new IntersectionObserver((entries) => {
@@ -796,9 +671,14 @@
             document.getElementById('minutes').innerText = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
             document.getElementById('seconds').innerText = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
         }
-        setInterval(updateCountdown, 1000); updateCountdown();
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
 
-        window.onload = initThree;
+        window.onload = () => {
+            initThree();
+            const activeLink = document.querySelector('.nav-link.active');
+            if (activeLink) moveIndicator(activeLink);
+        };
     </script>
 </body>
 
