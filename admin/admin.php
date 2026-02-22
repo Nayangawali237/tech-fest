@@ -6,13 +6,10 @@
 
 // --- CONFIGURATION ---
 $ADMIN_PIN = "aditya"; 
-$host = "localhost"; // Usually localhost for MariaDB on same EC2
+$host = "localhost"; 
 $username = 'techfest_user';
 $password = 'StrongPassword123';
 $dbname = "techfest_db";
-
-// Force error reporting for debugging on EC2 if needed (comment out for production)
-// error_reporting(E_ALL); ini_set('display_errors', 1);
 
 session_start();
 
@@ -28,7 +25,6 @@ if ($conn->connect_error) {
          </div>"); 
 }
 
-// Dynamically handle the redirect path
 $self = htmlspecialchars(basename($_SERVER['PHP_SELF']));
 
 // Handle Logout
@@ -43,14 +39,13 @@ $error_msg = "";
 if (isset($_POST['pin_input'])) {
     if ($_POST['pin_input'] === $ADMIN_PIN) {
         $_SESSION['authenticated_owner'] = true;
-        header("Location: $self"); // Refresh to clear POST data
+        header("Location: $self");
         exit();
     } else {
         $error_msg = "ACCESS DENIED: INVALID SECURITY PIN.";
     }
 }
 
-// Determine Current View
 $view = (isset($_GET['view']) && $_GET['view'] === 'queries') ? 'queries' : 'registrations';
 
 // --- ACTION LOGIC ---
@@ -71,7 +66,7 @@ if (isset($_SESSION['authenticated_owner'])) {
         exit();
     }
 
-    // Toggle Payment Status
+    // Toggle Payment Status (Verify or Revoke)
     if (isset($_GET['toggle_payment']) && isset($_GET['id'])) {
         $id = intval($_GET['id']);
         $new_status = ($_GET['toggle_payment'] === 'Verified') ? 'Verified' : 'Pending';
@@ -132,24 +127,33 @@ if ($view == 'registrations') {
         .metric-card { background: var(--bg-card); border: 1px solid var(--border); padding: 25px; border-radius: 15px; text-align: center; position: relative; }
         .metric-label { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; display: block; }
         .metric-value { font-size: 2.2rem; font-weight: 800; font-family: 'Orbitron'; }
+        
+        /* Login UI */
         .login-overlay { position: fixed; inset: 0; background: var(--bg-dark); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .login-card { background: var(--bg-card); padding: 40px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; width: 350px; box-shadow: 0 0 50px rgba(0, 242, 255, 0.1); }
         .pin-input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 1.5rem; letter-spacing: 5px; outline: none; font-family: Orbitron; }
-        .btn-primary { background: var(--primary); color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: Orbitron; }
+        
         .view-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
         .tab-link { text-decoration: none; padding: 10px 25px; border-radius: 25px; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--text-dim); border: 1px solid var(--border); transition: 0.3s; }
         .tab-link.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
+        
         .table-wrapper { background: var(--bg-card); border-radius: 15px; overflow-x: auto; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; min-width: 850px; }
         th { background: rgba(255, 255, 255, 0.05); text-align: left; padding: 15px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--primary); text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.9rem; }
+        
         .status-badge { padding: 4px 10px; border-radius: 5px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; font-family: 'Orbitron'; }
         .status-verified { background: rgba(0, 255, 136, 0.1); color: var(--success); border: 1px solid var(--success); }
         .status-pending { background: rgba(255, 170, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
-        .btn-action { text-decoration: none; font-size: 0.7rem; padding: 6px 12px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; display: inline-block; transition: 0.2s; }
-        .btn-verify { background: var(--success); color: #000; }
+        
+        .btn-action { text-decoration: none; font-size: 0.7rem; padding: 6px 12px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; display: inline-block; transition: 0.2s; text-align: center; }
+        .btn-primary { background: var(--primary); color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: Orbitron; }
+        .btn-verify { background: var(--success); color: #000; border: 1px solid var(--success); }
+        .btn-revoke { background: rgba(255, 170, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+        .btn-revoke:hover { background: var(--warning); color: #000; }
         .btn-delete { color: var(--danger); border: 1px solid var(--danger); }
         .btn-delete:hover { background: var(--danger); color: #fff; }
+        
         .btn-wa { background: #25D366; color: #fff; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
         .modal img { max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid var(--primary); }
@@ -196,7 +200,8 @@ if ($view == 'registrations') {
                     <tbody>
                         <?php if($result->num_rows > 0): while($row = $result->fetch_assoc()): 
                             $s_class = ($row['payment_status'] == 'Verified') ? 'status-verified' : 'status-pending';
-                            $wa_msg = urlencode("Hello " . $row['lead_name'] . ", your Techfest registration is VERIFIED! Join group: https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO");
+                            $wa_msg = urlencode("Hello " . $row['lead_name'] . ", your registration for expo at Techfest 2.0 has been VERIFIED. We look forward to seeing you!Stay updated with the latest announcements, schedules, and registration links.
+Join our official Techfest WhatsApp Group now!/ Open this link to join my WhatsApp Group: https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO?mode=gi_t");
                             $wa_url = "https://wa.me/" . preg_replace('/[^0-9]/', '', $row['lead_phone']) . "?text=" . $wa_msg;
                         ?>
                         <tr>
@@ -206,19 +211,22 @@ if ($view == 'registrations') {
                             <td>
                                 <div style="display:flex; gap:8px; align-items:center;">
                                     <button onclick="showImg('../uploads/<?php echo $row['transaction_proof']; ?>')" class="btn-primary" style="padding:5px 12px; font-size:0.6rem; width:auto;">PROOF</button>
+                                    
                                     <?php if($row['payment_status'] == 'Pending'): ?>
                                         <a href="?toggle_payment=Verified&id=<?php echo $row['id']; ?>" class="btn-action btn-verify">VERIFY</a>
                                     <?php else: ?>
+                                        <a href="?toggle_payment=Pending&id=<?php echo $row['id']; ?>" class="btn-action btn-revoke" onclick="return confirm('Revoke verification?')">REVOKE</a>
                                         <a href="<?php echo $wa_url; ?>" target="_blank" class="btn-wa" title="Send WA Confirmed">
                                             <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.512-2.96-2.626-.087-.114-.694-.922-.694-1.758 0-.837.434-1.246.587-1.412.144-.17.315-.21.424-.21.109 0 .21.002.302.007.098.005.23-.037.35.25.132.317.456 1.112.496 1.192.04.08.066.17.013.272-.053.102-.08.175-.162.27-.08.093-.173.205-.246.27-.087.08-.178.166-.076.337.103.17.458.753.985 1.22.68.606 1.254.796 1.431.884.178.088.283.074.388-.047.106-.123.456-.532.578-.714.122-.182.245-.153.413-.091.166.062 1.06.502 1.242.593.182.091.303.136.348.215.045.079.045.457-.1.862z"/></svg>
                                         </a>
                                     <?php endif; ?>
+                                    
                                     <a href="?delete_reg_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Erase record permanently?')">X</a>
                                 </div>
                             </td>
                         </tr>
                         <?php endwhile; else: ?>
-                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-dim);">No registration data found in the cloud database.</td></tr>
+                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-dim);">No registration data found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
