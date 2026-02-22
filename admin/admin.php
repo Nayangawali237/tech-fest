@@ -63,6 +63,13 @@ if (isset($_SESSION['authenticated_owner'])) {
         exit();
     }
 
+    if (isset($_GET['delete_stay_id'])) {
+        $id = intval($_GET['delete_stay_id']);
+        $conn->query("DELETE FROM stay_requests WHERE id = $id");
+        header("Location: $self?view=stay");
+        exit();
+    }
+
     if (isset($_GET['toggle_payment']) && isset($_GET['id'])) {
         $id = intval($_GET['id']);
         $new_status = ($_GET['toggle_payment'] === 'Verified') ? 'Verified' : 'Pending';
@@ -74,7 +81,7 @@ if (isset($_SESSION['authenticated_owner'])) {
     }
 }
 
-// --- CSV EXPORT (Updated to match schema) ---
+// --- CSV EXPORT ---
 if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     header('Content-Type: text/csv; charset=utf-8');
     $filename = 'Techfest_Data_' . ucfirst($view) . '_';
@@ -82,14 +89,14 @@ if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     $output = fopen('php://output', 'w');
     
     if ($view == 'registrations') {
-        fputcsv($output, array('ID', 'Event', 'Category', 'Team Name', 'College', 'Lead Name', 'Email', 'Phone', 'Additional Members', 'Fee', 'UTR', 'Status', 'Date'));
+        fputcsv($output, array('ID', 'Event', 'Category', 'Team Name', 'College', 'Lead Name', 'Email', 'Phone', 'Members', 'Fee', 'UTR', 'Status', 'Date'));
         $res = $conn->query("SELECT id, event_name, category, team_name, college, lead_name, lead_email, lead_phone, additional_members, total_fee, utr, payment_status, registration_date FROM registrations ORDER BY id DESC");
     } elseif ($view == 'queries') {
-        fputcsv($output, array('ID', 'Name', 'Email', 'Message', 'Date'));
-        $res = $conn->query("SELECT id, name, email, message, created_at FROM queries ORDER BY id DESC");
+        fputcsv($output, array('ID', 'Name', 'Email', 'Subject', 'Message', 'Date'));
+        $res = $conn->query("SELECT id, name, email, subject, message, created_at FROM queries ORDER BY id DESC");
     } elseif ($view == 'stay') {
-        fputcsv($output, array('ID', 'Name', 'Phone', 'Duration', 'Gender', 'Status', 'Request Date'));
-        $res = $conn->query("SELECT * FROM stay_requests ORDER BY id DESC");
+        fputcsv($output, array('ID', 'Full Name', 'College Name', 'Gender', 'Nights', 'Check-in', 'Phone', 'Requirements', 'Date'));
+        $res = $conn->query("SELECT id, full_name, college_name, gender, number_of_nights, check_in_date, phone_number, special_requirements, submitted_at FROM stay_requests ORDER BY id DESC");
     }
     
     if(isset($res)){ while ($row = $res->fetch_assoc()) { fputcsv($output, $row); } }
@@ -97,13 +104,11 @@ if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     exit();
 }
 
-// Metrics & Analytics
+// Metrics
 $total_participants = $conn->query("SELECT count(*) as count FROM registrations")->fetch_assoc()['count'] ?? 0;
 $total_queries = $conn->query("SELECT count(*) as count FROM queries")->fetch_assoc()['count'] ?? 0;
 $revenue_res = $conn->query("SELECT SUM(total_fee) as total FROM registrations WHERE payment_status = 'Verified'");
 $total_revenue = ($revenue_res && $row = $revenue_res->fetch_assoc()) ? $row['total'] : 0;
-
-// Event-wise Participation Analytics
 $event_stats = $conn->query("SELECT event_name, COUNT(*) as count FROM registrations GROUP BY event_name ORDER BY count DESC");
 
 // Data Fetching
@@ -112,8 +117,7 @@ if ($view == 'registrations') {
 } elseif ($view == 'queries') {
     $result = $conn->query("SELECT * FROM queries ORDER BY id DESC");
 } else {
-    $check_stay = $conn->query("SHOW TABLES LIKE 'stay_requests'");
-    $result = ($check_stay->num_rows > 0) ? $conn->query("SELECT * FROM stay_requests ORDER BY id DESC") : null;
+    $result = $conn->query("SELECT * FROM stay_requests ORDER BY id DESC");
 }
 ?>
 <!DOCTYPE html>
@@ -187,9 +191,9 @@ if ($view == 'registrations') {
         <h1>DASHBOARD ANALYTICS</h1>
 
         <div class="metrics-grid">
-            <div class="metric-card"><span class="metric-label">Total Users</span><div class="metric-value"><?php echo $total_participants; ?></div></div>
-            <div class="metric-card"><span class="metric-label">Revenue</span><div class="metric-value" style="color:var(--success);">₹<?php echo number_format($total_revenue); ?></div></div>
-            <div class="metric-card"><span class="metric-label">Queries</span><div class="metric-value" style="color:var(--primary);"><?php echo $total_queries; ?></div></div>
+            <div class="metric-card"><span class="metric-label">Total Participants</span><div class="metric-value"><?php echo $total_participants; ?></div></div>
+            <div class="metric-card"><span class="metric-label">Verified Revenue</span><div class="metric-value" style="color:var(--success);">₹<?php echo number_format($total_revenue); ?></div></div>
+            <div class="metric-card"><span class="metric-label">Support Queries</span><div class="metric-value" style="color:var(--primary);"><?php echo $total_queries; ?></div></div>
         </div>
 
         <div class="analytics-section">
@@ -222,7 +226,8 @@ if ($view == 'registrations') {
                     <tbody>
                         <?php if($result && $result->num_rows > 0): while($row = $result->fetch_assoc()): 
                             $s_class = ($row['payment_status'] == 'Verified') ? 'status-verified' : 'status-pending';
-                            $wa_msg = urlencode("Hello " . $row['lead_name'] . ", your registration for expo at Techfest 2.0 has been VERIFIED. We look forward to seeing you! Stay updated with the latest announcements, schedules, and registration links. Join our official Techfest WhatsApp Group now! https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO");
+                            // Updated WhatsApp message with the specific ?mode=gi_t parameter
+                            $wa_msg = urlencode("Hello " . $row['lead_name'] . ", your registration for expo at Techfest 2.0 has been VERIFIED. We look forward to seeing you! Stay updated with the latest announcements, schedules, and registration links. Join our official Techfest WhatsApp Group now! https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO?mode=gi_t");
                             $wa_url = "https://wa.me/" . preg_replace('/[^0-9]/', '', $row['lead_phone']) . "?text=" . $wa_msg;
                         ?>
                         <tr>
@@ -259,39 +264,54 @@ if ($view == 'registrations') {
                             </td>
                         </tr>
                         <?php endwhile; else: ?>
-                        <tr><td colspan="5" style="text-align:center; padding:50px; color:var(--text-dim);">No data found for this view.</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding:50px; color:var(--text-dim);">No registrations found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
             <?php elseif ($view == 'queries'): ?>
                 <table>
-                    <thead><tr><th>User</th><th>Message</th><th>Action</th></tr></thead>
+                    <thead><tr><th>User Info</th><th>Subject</th><th>Message Payload</th><th>Action</th></tr></thead>
                     <tbody>
                         <?php if($result && $result->num_rows > 0): while($row = $result->fetch_assoc()): ?>
                         <tr>
-                            <td><strong><?php echo htmlspecialchars($row["name"]); ?></strong><br><small><?php echo htmlspecialchars($row["email"]); ?></small></td>
-                            <td style="color:var(--text-dim);"><?php echo nl2br(htmlspecialchars($row["message"])); ?></td>
-                            <td><a href="?delete_query_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Delete query?')">DELETE</a></td>
+                            <td><strong><?php echo htmlspecialchars($row["name"]); ?></strong><br><small style="color:var(--primary);"><?php echo htmlspecialchars($row["email"]); ?></small></td>
+                            <td style="font-weight:bold; color:var(--primary);"><?php echo htmlspecialchars($row["subject"] ?? 'N/A'); ?></td>
+                            <td style="color:var(--text-dim); font-size:0.75rem; max-width:400px;"><?php echo nl2br(htmlspecialchars($row["message"])); ?></td>
+                            <td>
+                                <div style="display:flex; flex-direction:column; gap:5px;">
+                                    <small style="font-size:0.6rem; color:var(--text-dim);"><?php echo $row['created_at']; ?></small>
+                                    <a href="?delete_query_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Delete query?')">DELETE</a>
+                                </div>
+                            </td>
                         </tr>
-                        <?php endwhile; endif; ?>
+                        <?php endwhile; else: ?>
+                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-dim);">Inbox is empty.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             <?php elseif ($view == 'stay'): ?>
                 <table>
-                    <thead><tr><th>Guest Name</th><th>Contact</th><th>Details</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Guest & College</th><th>Contact</th><th>Stay Details</th><th>Requirements</th><th>Action</th></tr></thead>
                     <tbody>
                         <?php if($result && $result->num_rows > 0): while($row = $result->fetch_assoc()): ?>
                         <tr>
-                            <td><strong><?php echo htmlspecialchars($row["name"]); ?></strong></td>
-                            <td><?php echo htmlspecialchars($row["phone"]); ?></td>
+                            <td><strong><?php echo htmlspecialchars($row["full_name"]); ?></strong><br><small style="color:var(--text-dim);"><?php echo htmlspecialchars($row["college_name"]); ?></small></td>
+                            <td><?php echo htmlspecialchars($row["phone_number"]); ?></td>
                             <td>
-                                Duration: <?php echo htmlspecialchars($row["duration"] ?? 'N/A'); ?><br>
-                                Gender: <?php echo htmlspecialchars($row["gender"] ?? 'N/A'); ?>
+                                <span style="color:var(--primary); font-weight:bold;"><?php echo htmlspecialchars($row["gender"]); ?></span><br>
+                                <small><?php echo htmlspecialchars($row["number_of_nights"]); ?> Night(s)</small><br>
+                                <small>Check-in: <?php echo htmlspecialchars($row["check_in_date"]); ?></small>
                             </td>
-                            <td><span class="status-badge status-pending"><?php echo htmlspecialchars($row["status"] ?? 'Requested'); ?></span></td>
+                            <td style="font-size:0.7rem; color:var(--text-dim); max-width:250px;"><?php echo nl2br(htmlspecialchars($row["special_requirements"])); ?></td>
+                            <td>
+                                <div style="display:flex; flex-direction:column; gap:5px;">
+                                    <small style="font-size:0.6rem; color:var(--text-dim);"><?php echo $row['submitted_at']; ?></small>
+                                    <a href="?delete_stay_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Delete stay request?')">DELETE</a>
+                                </div>
+                            </td>
                         </tr>
                         <?php endwhile; else: ?>
-                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-dim);">No stay requests found.</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding:50px; color:var(--text-dim);">No stay requests found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
