@@ -82,15 +82,14 @@ if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     $output = fopen('php://output', 'w');
     
     if ($view == 'registrations') {
-        // Headers matching the schema provided
         fputcsv($output, array('ID', 'Event', 'Category', 'Team Name', 'College', 'Lead Name', 'Email', 'Phone', 'Additional Members', 'Fee', 'UTR', 'Status', 'Date'));
         $res = $conn->query("SELECT id, event_name, category, team_name, college, lead_name, lead_email, lead_phone, additional_members, total_fee, utr, payment_status, registration_date FROM registrations ORDER BY id DESC");
     } elseif ($view == 'queries') {
         fputcsv($output, array('ID', 'Name', 'Email', 'Message', 'Date'));
         $res = $conn->query("SELECT id, name, email, message, created_at FROM queries ORDER BY id DESC");
     } elseif ($view == 'stay') {
-        fputcsv($output, array('ID', 'Name', 'Phone', 'Duration', 'Gender', 'Status', 'Date'));
-        $res = $conn->query("SELECT * FROM stay_bookings ORDER BY id DESC");
+        fputcsv($output, array('ID', 'Name', 'Phone', 'Duration', 'Gender', 'Status', 'Request Date'));
+        $res = $conn->query("SELECT * FROM stay_requests ORDER BY id DESC");
     }
     
     if(isset($res)){ while ($row = $res->fetch_assoc()) { fputcsv($output, $row); } }
@@ -113,8 +112,8 @@ if ($view == 'registrations') {
 } elseif ($view == 'queries') {
     $result = $conn->query("SELECT * FROM queries ORDER BY id DESC");
 } else {
-    $check_stay = $conn->query("SHOW TABLES LIKE 'stay_bookings'");
-    $result = ($check_stay->num_rows > 0) ? $conn->query("SELECT * FROM stay_bookings ORDER BY id DESC") : null;
+    $check_stay = $conn->query("SHOW TABLES LIKE 'stay_requests'");
+    $result = ($check_stay->num_rows > 0) ? $conn->query("SELECT * FROM stay_requests ORDER BY id DESC") : null;
 }
 ?>
 <!DOCTYPE html>
@@ -275,6 +274,25 @@ if ($view == 'registrations') {
                             <td><a href="?delete_query_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Delete query?')">DELETE</a></td>
                         </tr>
                         <?php endwhile; endif; ?>
+                    </tbody>
+                </table>
+            <?php elseif ($view == 'stay'): ?>
+                <table>
+                    <thead><tr><th>Guest Name</th><th>Contact</th><th>Details</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <?php if($result && $result->num_rows > 0): while($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($row["name"]); ?></strong></td>
+                            <td><?php echo htmlspecialchars($row["phone"]); ?></td>
+                            <td>
+                                Duration: <?php echo htmlspecialchars($row["duration"] ?? 'N/A'); ?><br>
+                                Gender: <?php echo htmlspecialchars($row["gender"] ?? 'N/A'); ?>
+                            </td>
+                            <td><span class="status-badge status-pending"><?php echo htmlspecialchars($row["status"] ?? 'Requested'); ?></span></td>
+                        </tr>
+                        <?php endwhile; else: ?>
+                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-dim);">No stay requests found.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             <?php endif; ?>
