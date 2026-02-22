@@ -74,7 +74,7 @@ if (isset($_SESSION['authenticated_owner'])) {
     }
 }
 
-// --- CSV EXPORT (Updated to match requested image) ---
+// --- CSV EXPORT (Updated to match schema) ---
 if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     header('Content-Type: text/csv; charset=utf-8');
     $filename = 'Techfest_Data_' . ucfirst($view) . '_';
@@ -82,9 +82,9 @@ if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     $output = fopen('php://output', 'w');
     
     if ($view == 'registrations') {
-        // Headers matching the provided screenshot
-        fputcsv($output, array('ID', 'Event', 'Category', 'Team Name', 'College', 'Lead Name', 'Email', 'Phone', 'Members', 'Fee', 'UTR/Transaction', 'Status', 'Date'));
-        $res = $conn->query("SELECT id, event_name, category, team_name, college, lead_name, email, lead_phone, members, total_fee, transaction_id, payment_status, registration_date FROM registrations ORDER BY id DESC");
+        // Headers matching the schema provided
+        fputcsv($output, array('ID', 'Event', 'Category', 'Team Name', 'College', 'Lead Name', 'Email', 'Phone', 'Additional Members', 'Fee', 'UTR', 'Status', 'Date'));
+        $res = $conn->query("SELECT id, event_name, category, team_name, college, lead_name, lead_email, lead_phone, additional_members, total_fee, utr, payment_status, registration_date FROM registrations ORDER BY id DESC");
     } elseif ($view == 'queries') {
         fputcsv($output, array('ID', 'Name', 'Email', 'Message', 'Date'));
         $res = $conn->query("SELECT id, name, email, message, created_at FROM queries ORDER BY id DESC");
@@ -113,7 +113,6 @@ if ($view == 'registrations') {
 } elseif ($view == 'queries') {
     $result = $conn->query("SELECT * FROM queries ORDER BY id DESC");
 } else {
-    // Check if stay table exists to avoid errors
     $check_stay = $conn->query("SHOW TABLES LIKE 'stay_bookings'");
     $result = ($check_stay->num_rows > 0) ? $conn->query("SELECT * FROM stay_bookings ORDER BY id DESC") : null;
 }
@@ -135,7 +134,6 @@ if ($view == 'registrations') {
         .metric-label { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; display: block; }
         .metric-value { font-size: 1.8rem; font-weight: 800; font-family: 'Orbitron'; }
         
-        /* Event Analytics Table */
         .analytics-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 30px; }
         .analytics-title { font-family: 'Orbitron'; color: var(--primary); font-size: 0.8rem; margin-bottom: 15px; display: block; text-align: center; }
         .stats-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
@@ -160,13 +158,11 @@ if ($view == 'registrations') {
         .status-verified { background: rgba(0, 255, 136, 0.1); color: var(--success); border: 1px solid var(--success); }
         .status-pending { background: rgba(255, 170, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
         
-        .btn-action { text-decoration: none; font-size: 0.65rem; padding: 6px 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; display: inline-block; }
+        .btn-action { text-decoration: none; font-size: 0.65rem; padding: 6px 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; display: inline-block; text-align: center; }
         .btn-verify { background: var(--success); color: #000; }
         .btn-revoke { background: rgba(255, 170, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); margin-right: 5px; }
         .btn-delete { color: var(--danger); border: 1px solid var(--danger); }
         .btn-wa { background: #25D366; color: #fff; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
-        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -197,7 +193,6 @@ if ($view == 'registrations') {
             <div class="metric-card"><span class="metric-label">Queries</span><div class="metric-value" style="color:var(--primary);"><?php echo $total_queries; ?></div></div>
         </div>
 
-        <!-- Event Analytics Summary -->
         <div class="analytics-section">
             <span class="analytics-title">EVENT PARTICIPATION COUNTS</span>
             <div class="stats-grid">
@@ -239,20 +234,19 @@ if ($view == 'registrations') {
                             </td>
                             <td>
                                 <small><?php echo htmlspecialchars($row["college"] ?? 'N/A'); ?></small><br>
-                                <small style="color:var(--text-dim);"><?php echo htmlspecialchars($row["email"] ?? 'N/A'); ?></small>
+                                <small style="color:var(--text-dim);"><?php echo htmlspecialchars($row["lead_email"] ?? 'N/A'); ?></small>
                             </td>
                             <td>
                                 <span style="color:var(--primary);"><?php echo htmlspecialchars($row["event_name"]); ?></span><br>
                                 <small>Fee: ₹<?php echo $row['total_fee']; ?></small><br>
-                                <small style="font-size:0.6rem;">Members: <?php echo htmlspecialchars($row['members'] ?? '1'); ?></small>
+                                <small style="font-size:0.6rem;">Members: <?php echo htmlspecialchars($row['additional_members'] ?? 'None'); ?></small>
                             </td>
                             <td>
-                                <code style="font-size:0.7rem; color:var(--text-dim);"><?php echo htmlspecialchars($row["transaction_id"] ?? 'NO UTR'); ?></code><br>
+                                <code style="font-size:0.75rem; color:var(--primary);"><?php echo htmlspecialchars($row["utr"] ?? 'NO UTR'); ?></code><br>
                                 <span class="status-badge <?php echo $s_class; ?>"><?php echo $row['payment_status']; ?></span>
                             </td>
                             <td>
                                 <div style="display:flex; gap:5px; align-items:center;">
-                                    <button onclick="showImg('../uploads/<?php echo $row['transaction_proof']; ?>')" class="btn-primary" style="padding:5px 8px; font-size:0.55rem; width:auto;">PROOF</button>
                                     <?php if($row['payment_status'] == 'Pending'): ?>
                                         <a href="?toggle_payment=Verified&id=<?php echo $row['id']; ?>" class="btn-action btn-verify">VERIFY</a>
                                     <?php else: ?>
@@ -271,7 +265,6 @@ if ($view == 'registrations') {
                     </tbody>
                 </table>
             <?php elseif ($view == 'queries'): ?>
-                <!-- Standard Queries Table -->
                 <table>
                     <thead><tr><th>User</th><th>Message</th><th>Action</th></tr></thead>
                     <tbody>
@@ -291,17 +284,6 @@ if ($view == 'registrations') {
             <a href="?export=csv&view=<?php echo $view; ?>" style="color:var(--primary); font-size:0.7rem; text-decoration:none; font-family:Orbitron; border: 1px solid var(--primary); padding: 10px 25px; border-radius: 20px;">[ EXPORT <?php echo strtoupper($view); ?> TO CSV ]</a>
         </div>
     </div>
-
-    <div id="imgModal" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content"><img id="modalImg" src=""></div>
-    </div>
-
-    <script>
-        function showImg(url) {
-            document.getElementById('modalImg').src = url;
-            document.getElementById('imgModal').style.display = 'flex';
-        }
-    </script>
 <?php endif; ?>
 </body>
 </html>
