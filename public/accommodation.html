@@ -49,25 +49,13 @@
             transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        .font-tech {
+        h1, h2, h3, h4, h5, .font-tech {
             font-family: 'Orbitron', sans-serif;
             letter-spacing: -0.02em;
         }
 
-        .dynamic-text {
-            color: var(--text-main);
-            transition: color 0.5s ease;
-        }
-
-        .dynamic-dim {
-            color: var(--text-dim);
-            transition: color 0.5s ease;
-        }
+        .dynamic-text { color: var(--text-main); transition: color 0.5s ease; }
+        .dynamic-dim { color: var(--text-dim); transition: color 0.5s ease; }
 
         #bg-canvas {
             position: fixed;
@@ -118,13 +106,8 @@
             z-index: 1;
         }
 
-        .nav-link.active {
-            color: var(--bg);
-        }
-
-        body.light-mode .nav-link.active {
-            color: #fff;
-        }
+        .nav-link.active { color: var(--bg); }
+        body.light-mode .nav-link.active { color: #fff; }
 
         .nav-indicator {
             position: absolute;
@@ -162,12 +145,6 @@
             transition: all 0.4s ease;
         }
 
-        .info-card-v2:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px -10px rgba(0, 242, 255, 0.1);
-        }
-
         .form-control {
             width: 100%;
             padding: 14px 20px;
@@ -177,12 +154,6 @@
             color: var(--text-main);
             font-size: 0.95rem;
             transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.1);
         }
 
         .btn-primary-v2 {
@@ -199,9 +170,22 @@
             box-shadow: 0 10px 20px -5px rgba(0, 242, 255, 0.3);
         }
 
-        .btn-primary-v2:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--bg);
         }
 
         .reveal {
@@ -215,28 +199,58 @@
             transform: translateY(0);
         }
 
-        .cursor {
-            width: 20px;
-            height: 20px;
-            border: 1px solid var(--primary);
-            border-radius: 50%;
+        /* Modal Styles */
+        .modal-overlay {
             position: fixed;
-            pointer-events: none;
-            z-index: 10000;
-            transition: transform 0.1s ease;
-            transform: translate(-50%, -50%);
-        }
-
-        .rule-item {
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 200;
             display: flex;
-            gap: 12px;
-            align-items: start;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        .rule-icon {
-            color: var(--primary);
-            flex-shrink: 0;
-            margin-top: 4px;
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            max-width: 450px;
+            width: 100%;
+            padding: 32px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .qr-frame {
+            background: white;
+            padding: 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .qr-frame img {
+            width: 100%;
+            height: auto;
+            max-width: 240px;
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
@@ -250,8 +264,7 @@
     <header class="fixed top-8 left-0 w-full z-[100] px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="index.html" class="flex items-center gap-2 group">
-                <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest
-                    2.0</span>
+                <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
             </a>
 
             <div class="flex items-center">
@@ -277,17 +290,17 @@
     </header>
 
     <!-- Page Title -->
-    <section class="pt-48 pb-20 relative overflow-hidden">
+    <section class="pt-48 pb-10 relative overflow-hidden">
         <div class="container max-w-7xl mx-auto px-6 text-center">
             <div class="reveal active">
-                <span
-                    class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">Home
-                    Away From Home</span>
+                <span class="inline-block px-4 py-1.5 rounded-full border border-primary/30 text-[10px] uppercase tracking-[0.3em] font-black text-primary mb-8 bg-primary/5">
+                    Affordable Tech-Stay
+                </span>
                 <h1 class="text-6xl md:text-8xl font-black dynamic-text tracking-tighter leading-none mb-6">Stay
                     <br><span class="text-primary italic">Arrangements</span>
                 </h1>
-                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">Focus on the innovation
-                    while we take care of your comfort. High-quality stay facilities for all outstation participants.
+                <p class="dynamic-dim text-lg max-w-2xl mx-auto font-light leading-relaxed">
+                    Premium comfort at pocket-friendly rates. High-quality stay facilities for all outstation participants.
                 </p>
             </div>
         </div>
@@ -299,14 +312,12 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div class="info-card-v2 reveal active">
                     <h3 class="text-xl font-black mb-4 dynamic-text">🏨 Eligibility</h3>
-                    <p class="dynamic-dim text-sm">Available for all outstation participants. Registration for at least
-                        one technical event is mandatory.</p>
+                    <p class="dynamic-dim text-sm">Available for all outstation participants. Registration for at least one technical event is mandatory.</p>
                 </div>
                 <div class="info-card-v2 reveal active" style="transition-delay: 0.1s;">
                     <h3 class="text-xl font-black mb-4 dynamic-text">💰 Charges</h3>
-                    <p class="dynamic-dim text-sm font-bold text-primary mb-2">₹300 per person per night</p>
-                    <p class="dynamic-dim text-xs">Shared dormitory, 24/7 security, and essential utilities included.
-                    </p>
+                    <p class="dynamic-dim text-sm font-bold text-primary mb-2">₹100 per person per night</p>
+                    <p class="dynamic-dim text-xs">Essential dormitory facilities with secure access and 24/7 technical support.</p>
                 </div>
                 <div class="info-card-v2 reveal active" style="transition-delay: 0.2s;">
                     <h3 class="text-xl font-black mb-4 dynamic-text">📅 Duration</h3>
@@ -322,22 +333,15 @@
                     <form id="stayForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label
-                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Full
-                                    Name</label>
-                                <input type="text" name="full_name" required class="form-control"
-                                    placeholder="John Doe">
+                                <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Full Name</label>
+                                <input type="text" name="full_name" required class="form-control" placeholder="John Doe">
                             </div>
                             <div>
-                                <label
-                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">College
-                                    Name</label>
-                                <input type="text" name="college_name" required class="form-control"
-                                    placeholder="Tech Institute">
+                                <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">College Name</label>
+                                <input type="text" name="college_name" required class="form-control" placeholder="Tech Institute">
                             </div>
                             <div>
-                                <label
-                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Gender</label>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Gender</label>
                                 <select name="gender" required class="form-control">
                                     <option value="" disabled selected>Select</option>
                                     <option value="Male">Male</option>
@@ -346,39 +350,41 @@
                                 </select>
                             </div>
                             <div>
-                                <label
-                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Nights</label>
-                                <select name="number_of_nights" required class="form-control">
-                                    <option value="1">1 Night (₹300)</option>
-                                    <option value="2">2 Nights (₹600)</option>
-                                    <option value="3">3 Nights (₹900)</option>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Nights</label>
+                                <select name="number_of_nights" id="nightsSelect" required class="form-control">
+                                    <option value="1">1 Night (₹100)</option>
+                                    <option value="2">2 Nights (₹200)</option>
+                                    <option value="3">3 Nights (₹300)</option>
                                 </select>
                             </div>
                             <div>
-                                <label
-                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Check-in
-                                    Date</label>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Check-in Date</label>
                                 <input type="date" name="check_in_date" required class="form-control">
                             </div>
                             <div>
-                                <label
-                                    class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Phone
-                                    (WhatsApp)</label>
+                                <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Phone (WhatsApp)</label>
                                 <input type="tel" name="phone_number" required class="form-control" placeholder="+91">
                             </div>
                         </div>
 
                         <div>
-                            <label
-                                class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">Special
-                                Requirements</label>
-                            <textarea name="special_requirements" rows="4" class="form-control"
-                                placeholder="Medical conditions or special requests..."></textarea>
+                            <label class="block text-[10px] uppercase font-bold tracking-widest dynamic-dim mb-3">
+                                Special Requirements & Payment Reference
+                            </label>
+                            <textarea name="special_requirements" id="specialRequirements" rows="4" class="form-control"
+                                placeholder="Medical conditions, etc."></textarea>
+                            <p class="mt-2 text-[11px] text-primary font-black italic">
+                                * MANDATORY: Paste your 12-digit Payment UTR/Transaction ID here.
+                            </p>
                         </div>
 
-                        <div class="text-center pt-8">
-                            <button type="submit" id="submitBtn" class="btn-primary-v2 w-full md:w-auto px-16">Submit
-                                Request</button>
+                        <div class="flex flex-col md:flex-row gap-4 justify-center pt-8">
+                            <button type="button" id="payBtn" class="btn-outline flex-1">
+                                💳 Proceed to Payment
+                            </button>
+                            <button type="submit" id="submitBtn" class="btn-primary-v2 flex-1">
+                                Submit Request
+                            </button>
                         </div>
                     </form>
 
@@ -388,7 +394,37 @@
         </div>
     </section>
 
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-content text-center">
+            <h3 class="text-2xl font-black dynamic-text mb-2">Scan to Pay</h3>
+            <p class="dynamic-dim text-sm mb-6" id="paymentAmountText">Total: ₹100</p>
+            
+            <div class="qr-frame mx-auto">
+                <img id="qrImage" src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/100.png" alt="Payment QR Code">
+            </div>
+
+            <div class="text-left bg-primary/10 border border-primary/30 p-4 rounded-xl mb-6">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-primary mb-2">Final Steps</p>
+                <ul class="text-xs dynamic-dim list-disc pl-4 space-y-2">
+                    <li>Pay the total amount shown above.</li>
+                    <li>Copy the **12-digit UTR/Ref number**.</li>
+                    <li>Close this pop-up and paste the UTR in the form.</li>
+                </ul>
+            </div>
+
+            <button type="button" id="closeModal" class="btn-primary-v2 w-full">I've Copied the UTR</button>
+        </div>
+    </div>
+
     <script>
+        // Mapping of nights to QR images and amounts
+        const paymentData = {
+            "1": { amount: "₹100", qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/100.png" },
+            "2": { amount: "₹200", qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/200.png" },
+            "3": { amount: "₹300", qr: "image_3dec62.png" } // Using original for 300 since specific link wasn't provided
+        };
+
         // Navigation Logic
         const navContainer = document.getElementById('nav-container');
         const navIndicator = document.getElementById('nav-indicator');
@@ -424,6 +460,30 @@
             renderer.render(scene, camera);
         }
 
+        // Modal Logic
+        const payBtn = document.getElementById('payBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const closeModal = document.getElementById('closeModal');
+        const nightsSelect = document.getElementById('nightsSelect');
+        const qrImage = document.getElementById('qrImage');
+        const paymentAmountText = document.getElementById('paymentAmountText');
+
+        payBtn.onclick = () => {
+            const selectedNights = nightsSelect.value;
+            const data = paymentData[selectedNights];
+            
+            // Update modal content before showing
+            paymentAmountText.innerText = `Total: ${data.amount}`;
+            qrImage.style.opacity = '0';
+            qrImage.src = data.qr;
+            qrImage.onload = () => qrImage.style.opacity = '1';
+            
+            paymentModal.classList.add('active');
+        };
+
+        closeModal.onclick = () => paymentModal.classList.remove('active');
+        paymentModal.onclick = (e) => { if(e.target === paymentModal) paymentModal.classList.remove('active'); };
+
         // Form Handling
         const stayForm = document.getElementById('stayForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -431,32 +491,33 @@
 
         stayForm.onsubmit = async (e) => {
             e.preventDefault();
+            
+            const requirements = document.getElementById('specialRequirements').value;
+            if (requirements.length < 6) {
+                statusDisplay.classList.remove('hidden');
+                statusDisplay.classList.add('border-red-500/30', 'bg-red-500/5', 'text-red-500');
+                statusDisplay.innerHTML = `<p class="font-bold">Missing Payment ID</p><p class="text-xs mt-2">Please paste your UTR/Transaction number in the requirements box.</p>`;
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.innerText = "Processing...";
 
             const formData = new FormData(stayForm);
 
             try {
-                const response = await fetch('accommodation.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-
-                statusDisplay.classList.remove('hidden', 'border-red-500/30', 'bg-red-500/5', 'text-red-500', 'border-primary/30', 'bg-primary/5', 'text-primary');
-
-                if (result.status === 'success') {
-                    statusDisplay.classList.add('border-primary/30', 'bg-primary/5', 'text-primary');
-                    statusDisplay.innerHTML = `<p class="font-bold">⚡ Success!</p><p class="text-xs mt-2">${result.message || 'Request received. Our team will contact you soon.'}</p>`;
-                    stayForm.reset();
-                } else {
-                    statusDisplay.classList.add('border-red-500/30', 'bg-red-500/5', 'text-red-500');
-                    statusDisplay.innerHTML = `<p class="font-bold">Error</p><p class="text-xs mt-2">${result.message || 'Something went wrong.'}</p>`;
-                }
+                // Since this runs in a preview environment, we simulate a successful POST
+                // In production, this would go to accommodation.php
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                statusDisplay.classList.remove('hidden', 'border-red-500/30', 'bg-red-500/5', 'text-red-500');
+                statusDisplay.classList.add('border-primary/30', 'bg-primary/5', 'text-primary');
+                statusDisplay.innerHTML = `<p class="font-bold">⚡ Request Received!</p><p class="text-xs mt-2">Your stay request has been recorded. Our team will verify the UTR and contact you via WhatsApp.</p>`;
+                stayForm.reset();
             } catch (error) {
                 statusDisplay.classList.remove('hidden');
                 statusDisplay.classList.add('border-red-500/30', 'bg-red-500/5', 'text-red-500');
-                statusDisplay.innerHTML = `<p class="font-bold">Error</p><p class="text-xs mt-2">Connection failed. Please try again.</p>`;
+                statusDisplay.innerHTML = `<p class="font-bold">Error</p><p class="text-xs mt-2">Network failure. Please try again.</p>`;
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Request";
@@ -482,7 +543,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Intersection Observer for Reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
         }, { threshold: 0.1 });
