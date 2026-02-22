@@ -113,6 +113,7 @@
             transform: translateY(0);
         }
 
+        /* Responsive Nav Adjustment */
         .nav-float {
             background: var(--nav-bg);
             backdrop-filter: blur(25px);
@@ -122,19 +123,24 @@
             position: relative;
             display: flex;
             align-items: center;
-            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5),
-                0 5px 15px -5px rgba(0, 0, 0, 0.2);
-            transition: box-shadow 0.4s ease, background 0.5s ease, border 0.5s ease;
-        }
-
-        body.light-mode .nav-float {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s ease;
+            max-width: 90vw;
         }
 
         .nav-links-container {
             display: flex;
             position: relative;
             z-index: 1;
+            overflow-x: auto;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-links-container::-webkit-scrollbar {
+            display: none;
         }
 
         .nav-link {
@@ -144,10 +150,11 @@
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 10px 14px;
+            padding: 12px 16px;
             transition: color 0.4s ease;
             position: relative;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .nav-link.active {
@@ -168,6 +175,7 @@
             z-index: 0;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+            pointer-events: none;
         }
 
         .theme-toggle {
@@ -182,31 +190,12 @@
             color: var(--text-main);
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-left: 1rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--primary);
-            box-shadow: 0 15px 25px -5px rgba(0, 242, 255, 0.15);
-            transform: scale(1.05);
-        }
-
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2.5px;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.light-mode .theme-toggle svg {
-            transform: rotate(360deg);
+            margin-left: 0.5rem;
+            flex-shrink: 0;
         }
 
         .hero-title-main {
-            font-size: clamp(3.5rem, 12vw, 10rem);
+            font-size: clamp(3rem, 12vw, 10rem);
             line-height: 0.85;
             font-weight: 900;
             text-transform: uppercase;
@@ -217,13 +206,11 @@
         .outline-text {
             -webkit-text-stroke: 1px var(--text-dim);
             color: transparent;
-            transition: -webkit-text-stroke 0.5s ease;
         }
 
         .glow-cyan {
             color: var(--primary);
             text-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
-            transition: color 0.5s ease, text-shadow 0.5s ease;
         }
 
         .btn-apply {
@@ -231,25 +218,22 @@
             color: var(--btn-text);
             transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
             box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
         }
 
         .btn-apply:hover {
             transform: scale(1.05);
             background: var(--primary);
             color: #000;
-            box-shadow: 0 15px 30px -5px rgba(0, 242, 255, 0.2);
         }
 
         .event-card-v2 {
-            position: relative;
             background: var(--card-bg);
             border: 1px solid var(--border);
             padding: 40px;
             border-radius: 12px;
-            transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1);
-            overflow: hidden;
             backdrop-filter: blur(12px);
-            z-index: 1;
+            transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1);
         }
 
         .event-card-v2:hover {
@@ -262,45 +246,15 @@
             border: 1px solid var(--border);
             padding: 30px;
             border-radius: 12px;
-            transition: 0.3s;
-        }
-
-        .stat-card-modern:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
         }
 
         .sponsor-card-v2 {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             background: var(--card-bg);
             border: 1px solid var(--border);
             padding: 40px;
             border-radius: 20px;
-            transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-            cursor: pointer;
             backdrop-filter: blur(10px);
-        }
-
-        .sponsor-card-v2:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -15px rgba(0, 242, 255, 0.15);
-        }
-
-        .sponsor-logo-img {
-            max-width: 200px;
-            filter: grayscale(1) brightness(1.5);
             transition: 0.4s;
-        }
-
-        .sponsor-card-v2:hover .sponsor-logo-img {
-            filter: grayscale(0) brightness(1);
-        }
-
-        body.light-mode .sponsor-logo-img {
-            filter: grayscale(1) contrast(0.5);
         }
 
         .scroll-indicator {
@@ -321,9 +275,26 @@
             background: linear-gradient(to bottom, var(--primary), transparent);
         }
 
-        section {
-            position: relative;
-            z-index: 10;
+        @media (max-width: 1280px) {
+            .nav-float {
+                order: 3;
+                width: 100%;
+                margin-top: 20px;
+                max-width: none;
+                border-radius: 20px;
+            }
+            .header-container {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 640px) {
+            header {
+                top: 15px !important;
+                padding: 0 15px !important;
+            }
+            .logo-text { font-size: 14px; }
+            .btn-apply { padding: 8px 16px !important; font-size: 8px !important; }
         }
     </style>
 </head>
@@ -335,28 +306,18 @@
 
     <!-- Header -->
     <header class="fixed top-8 left-0 w-full z-[100] px-6">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="max-w-7xl mx-auto flex justify-between items-center header-container">
+            <!-- Logo -->
             <div class="logo">
                 <a href="index.html" class="flex items-center gap-2 group">
                     <span class="logo-text text-lg font-black tracking-tighter uppercase font-tech dynamic-text">Techfest 2.0</span>
                 </a>
             </div>
 
-            <div class="flex items-center">
-                <div class="nav-float hidden xl:flex">
-                    <div class="nav-indicator" id="nav-indicator"></div>
-                    <div class="nav-links-container" id="nav-container">
-                        <a href="index.html" class="nav-link active">Home</a>
-                        <a href="events.html" class="nav-link">Events</a>
-                        <a href="registrations.html" class="nav-link">Register</a>
-                        <a href="accommodation.html" class="nav-link">Stay</a>
-                        <a href="team.html" class="nav-link">Team</a>
-                        <a href="sponsors.html" class="nav-link">Sponsors</a>
-                        <a href="about.html" class="nav-link">About</a>
-                        <a href="contact.html" class="nav-link">Contact</a>
-                    </div>
-                </div>
-
+            <!-- Action Buttons -->
+            <div class="flex items-center order-2">
+                <a href="registrations.html" class="btn-apply text-[10px] uppercase font-black px-6 py-3 rounded-full mr-2">Register Now</a>
+                
                 <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
                     <svg id="sun-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -367,12 +328,25 @@
                 </button>
             </div>
 
-            <a href="registrations.html" class="btn-apply hidden md:block text-[10px] uppercase font-black px-8 py-3.5 rounded-full">Register Now</a>
+            <!-- Navigation Bar (Scrollable on mobile) -->
+            <div class="nav-float flex overflow-hidden">
+                <div class="nav-indicator" id="nav-indicator"></div>
+                <div class="nav-links-container" id="nav-container">
+                    <a href="index.html" class="nav-link active">Home</a>
+                    <a href="events.html" class="nav-link">Events</a>
+                    <a href="registrations.html" class="nav-link">Register</a>
+                    <a href="accommodation.html" class="nav-link">Stay</a>
+                    <a href="team.html" class="nav-link">Team</a>
+                    <a href="sponsors.html" class="nav-link">Sponsors</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </div>
+            </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="min-h-screen flex items-center justify-center pt-32 md:pt-48 pb-20 relative overflow-hidden">
+    <section class="min-h-screen flex items-center justify-center pt-48 pb-20 relative overflow-hidden">
         <div class="container relative px-6 mx-auto">
             <div class="flex flex-col lg:flex-row items-center lg:items-end gap-12 lg:gap-16">
                 <div class="reveal active w-full lg:w-auto text-center lg:text-left">
@@ -403,7 +377,7 @@
             </div>
         </div>
         <div class="scroll-indicator reveal">
-            <span class="text-[9px] uppercase tracking-[0.4em] dynamic-dim">Scroll</span>
+            <span class="text-[9px] uppercase tracking-[0.4em] dynamic-dim mb-2">Scroll</span>
             <div class="scroll-line"></div>
         </div>
     </section>
@@ -413,11 +387,10 @@
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div class="reveal">
                 <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">The Hub of Innovation</span>
-                <h2 class="text-6xl font-black mt-6 mb-10 tracking-tight leading-none dynamic-text">The Future <br>Starts Here</h2>
+                <h2 class="text-5xl font-black mt-6 mb-10 tracking-tight leading-tight dynamic-text">The Future <br>Starts Here</h2>
                 <div class="space-y-6 dynamic-dim text-lg font-light leading-relaxed">
                     <p>Techfest 2.0 is the flagship technical festival of the Indian Society for Technical Education (ISTE), bringing together the brightest minds from across the nation.</p>
                     <p>For three electrifying days, we transform our campus into a hub of innovation, creativity, and technological excellence.</p>
-                    <p>With cutting-edge competitions, interactive workshops, inspiring guest lectures, and countless networking opportunities, Techfest 2.0 is where ideas come to life.</p>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-6 reveal" style="transition-delay: 0.2s;">
@@ -534,13 +507,13 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-24 reveal">
                 <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Our Partners</span>
-                <h2 class="text-6xl md:text-8xl font-black mt-6 tracking-tighter dynamic-text">Powered By <br>Innovation</h2>
+                <h2 class="text-5xl md:text-8xl font-black mt-6 tracking-tighter dynamic-text">Powered By Innovation</h2>
             </div>
 
             <div class="max-w-2xl mx-auto">
                 <div class="reveal">
-                    <a href="https://scdsanjivani.awscc.tech/" target="_blank" class="sponsor-card-v2">
-                        <img src="https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/AWSCC_Sanjivani.png" alt="AWS Cloud Club" class="sponsor-logo-img mb-6">
+                    <a href="https://scdsanjivani.awscc.tech/" target="_blank" class="sponsor-card-v2 flex flex-col items-center">
+                        <img src="https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/AWSCC_Sanjivani.png" alt="AWS Cloud Club" class="max-w-[200px] mb-6 filter grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
                         <div class="text-center">
                             <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary block mb-2">Tech Sponsor</span>
                             <p class="text-sm md:text-base font-semibold dynamic-text tracking-wide">AWS Cloud Club Sanjivani</p>
@@ -561,10 +534,10 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-32 border-t border-white/5 px-6 bg-black backdrop-blur-md relative z-[20]">
+    <footer class="py-24 border-t border-white/5 px-6 bg-black relative z-[20]">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
             <div class="lg:col-span-1">
-                <span class="text-3xl font-black font-tech tracking-tighter dynamic-text">Techfest 2.0</span>
+                <span class="text-2xl font-black font-tech tracking-tighter dynamic-text">Techfest 2.0</span>
                 <p class="dynamic-dim mt-8 text-sm font-light leading-relaxed">India's premier technical festival celebrating innovation, creativity, and technological excellence. Organized with passion by the ISTE Student Team.</p>
                 <div class="flex gap-4 mt-8">
                     <a href="#" class="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-all">📸</a>
@@ -574,7 +547,7 @@
             </div>
             <div>
                 <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Quick Links</h5>
-                <ul class="space-y-4 dynamic-dim text-[11px] font-bold tracking-widest uppercase">
+                <ul class="space-y-4 dynamic-dim text-[10px] font-bold tracking-widest uppercase">
                     <li><a href="index.html" class="hover:text-primary transition-colors">Home</a></li>
                     <li><a href="events.html" class="hover:text-primary transition-colors">Events</a></li>
                     <li><a href="registrations.html" class="hover:text-primary transition-colors">Register</a></li>
@@ -583,7 +556,7 @@
             </div>
             <div>
                 <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Explore</h5>
-                <ul class="space-y-4 dynamic-dim text-[11px] font-bold tracking-widest uppercase">
+                <ul class="space-y-4 dynamic-dim text-[10px] font-bold tracking-widest uppercase">
                     <li><a href="team.html" class="hover:text-primary transition-colors">The Team</a></li>
                     <li><a href="sponsors.html" class="hover:text-primary transition-colors">Sponsors</a></li>
                     <li><a href="about.html" class="hover:text-primary transition-colors">About Us</a></li>
@@ -592,15 +565,15 @@
             </div>
             <div>
                 <h5 class="text-[10px] uppercase font-black tracking-[0.4em] text-primary mb-8">Contact Us</h5>
-                <ul class="space-y-4 dynamic-dim text-xs font-light leading-loose">
+                <ul class="space-y-4 dynamic-dim text-xs font-light leading-relaxed">
                     <li>📧 principalcoe@sanjivani.org.in</li>
                     <li>📞 +91 91 75811 770</li>
-                    <li><a href="https://sanjivanicoe.org.in/"</a></li>
+                    <li>🌐 <a href="https://sanjivanicoe.org.in/" class="hover:text-primary transition-colors">sanjivanicoe.org.in</a></li>
                     <li>📍 Sanjivani College of Engineering<br>Kopargaon, Maharashtra 423603</li>
                 </ul>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto pt-32 text-center text-[9px] uppercase tracking-[0.8em] dynamic-dim opacity-30">
+        <div class="max-w-7xl mx-auto pt-20 text-center text-[8px] uppercase tracking-[0.8em] dynamic-dim opacity-30">
             &copy; 2026 Techfest 2.0 | Designed with ⚡ by ISTE TEAM
         </div>
     </footer>
@@ -612,17 +585,35 @@
 
         function moveIndicator(element) {
             if (!element) return;
-            const rect = element.getBoundingClientRect();
-            const parentRect = navContainer.getBoundingClientRect();
-            navIndicator.style.width = `${rect.width}px`;
-            navIndicator.style.left = `${rect.left - parentRect.left}px`;
+            
+            const linkWidth = element.offsetWidth;
+            const linkLeft = element.offsetLeft;
+            
+            navIndicator.style.width = `${linkWidth}px`;
+            navIndicator.style.left = `${linkLeft}px`;
+            
+            const containerWidth = navContainer.offsetWidth;
+            const scrollLeft = navContainer.scrollLeft;
+            
+            if (linkLeft < scrollLeft) {
+                navContainer.scrollTo({ left: linkLeft - 20, behavior: 'smooth' });
+            } else if ((linkLeft + linkWidth) > (scrollLeft + containerWidth)) {
+                navContainer.scrollTo({ left: (linkLeft + linkWidth) - containerWidth + 20, behavior: 'smooth' });
+            }
         }
 
         const activeLink = document.querySelector('.nav-link.active');
-        if (activeLink) moveIndicator(activeLink);
+        if (activeLink) {
+            setTimeout(() => moveIndicator(activeLink), 100);
+        }
 
         navLinks.forEach(link => {
             link.addEventListener('mouseenter', (e) => moveIndicator(e.target));
+            link.addEventListener('click', (e) => {
+                navLinks.forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+                moveIndicator(e.target);
+            });
             link.addEventListener('mouseleave', () => {
                 const currentActive = document.querySelector('.nav-link.active');
                 if (currentActive) moveIndicator(currentActive);
@@ -639,10 +630,12 @@
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
             const geometry = new THREE.IcosahedronGeometry(2.5, 2);
             const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15 });
             coreMesh = new THREE.Mesh(geometry, material);
             scene.add(coreMesh);
+            
             const pointsGeom = new THREE.BufferGeometry();
             const posArray = new Float32Array(1000 * 3);
             for (let i = 0; i < 3000; i++) posArray[i] = (Math.random() - 0.5) * 15;
