@@ -24,6 +24,7 @@
             --card-bg: rgba(255, 255, 255, 0.05);
             --btn-bg: #ffffff;
             --btn-text: #000000;
+            --glow: rgba(0, 242, 255, 0.3);
         }
 
         body.light-mode {
@@ -37,6 +38,7 @@
             --btn-bg: #0f172a;
             --btn-text: #ffffff;
             --primary: #4f46e5;
+            --glow: rgba(79, 70, 229, 0.15);
         }
 
         body {
@@ -143,12 +145,39 @@
             padding: 24px;
             transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
             text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            /* Glowing edge effect */
+            box-shadow: 0 0 15px -5px var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Pseudo-element for constant thin glowing border */
+        .member-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1px; 
+            background: linear-gradient(135deg, var(--primary), transparent, var(--primary));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.3;
+            transition: opacity 0.4s ease;
         }
 
         .member-card:hover {
             border-color: var(--primary);
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px -5px var(--primary);
+        }
+
+        .member-card:hover::after {
+            opacity: 1;
         }
 
         .photo-wrapper {
@@ -158,6 +187,8 @@
             margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
         }
 
         .member-img {
@@ -180,12 +211,15 @@
             font-size: 14px;
             transition: all 0.3s ease;
             border: 1px solid var(--border);
+            position: relative;
+            z-index: 2;
         }
 
         .social-link-v2:hover {
             background: var(--primary);
             color: var(--bg);
             transform: translateY(-3px);
+            box-shadow: 0 0 15px var(--primary);
         }
 
         .reveal {
@@ -258,8 +292,6 @@
                         <a href="registrations.html" class="nav-link">Register</a>
                         <a href="accommodation.html" class="nav-link">Stay</a>
                         <a href="team.html" class="nav-link active">Team</a>
-                        <a href="sponsors.html" class="nav-link">Sponsors</a>
-                        <a href="about.html" class="nav-link">About</a>
                         <a href="contact.html" class="nav-link">Contact</a>
                     </div>
                 </div>
@@ -293,7 +325,7 @@
     <section class="pb-40 px-6 relative z-10">
         <div class="max-w-7xl mx-auto">
 
-            <!-- Core Committee -->
+            <!-- Core Committee Section -->
             <div class="mb-32">
                 <div class="text-center mb-16 reveal">
                     <span class="section-tag">Leadership</span>
@@ -305,11 +337,11 @@
                         <div class="photo-wrapper">
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Rohit.JPG" alt="Rohit Kakad" class="member-img">
                         </div>
-                        <h3 class="text-xl font-black dynamic-text mb-1">Rohit Kakad</h3>
+                        <h3 class="text-xl font-black dynamic-text mb-1 text-center">Rohit Kakad</h3>
                         <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Chairperson</p>
                         <span class="phone-num">+91 90287 34278</span>
-                        <div class="flex justify-center gap-3">
-                            <a href="mailto:#" class="social-link-v2">📧</a>
+                        <div class="mt-auto flex justify-center">
+                            <a href="mailto:rohitkakad@example.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                     <!-- Sumedha -->
@@ -317,10 +349,10 @@
                         <div class="photo-wrapper">
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sumedha.PNG" alt="Sumedha Ghodke" class="member-img">
                         </div>
-                        <h3 class="text-xl font-black dynamic-text mb-1">Sumedha Ghodke</h3>
+                        <h3 class="text-xl font-black dynamic-text mb-1 text-center">Sumedha Ghodke</h3>
                         <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Vice President</p>
                         <span class="phone-num">+91 84595 93312</span>
-                        <div class="flex justify-center gap-3">
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:sumedhaghodke1124@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
@@ -329,10 +361,10 @@
                         <div class="photo-wrapper">
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Gagan%20Gaware.PNG" alt="Gagan Gaware" class="member-img">
                         </div>
-                        <h3 class="text-xl font-black dynamic-text mb-1">Gagan Gaware</h3>
+                        <h3 class="text-xl font-black dynamic-text mb-1 text-center">Gagan Gaware</h3>
                         <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Secretary</p>
-                        <span class="phone-num">+91 9175811770</span>
-                        <div class="flex justify-center gap-3">
+                        <span class="phone-num">+91 91758 11770</span>
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:gagangaware070@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
@@ -341,19 +373,20 @@
                         <div class="photo-wrapper">
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Utkarsh.JPG" alt="Utkarsh Patil" class="member-img">
                         </div>
-                        <h3 class="text-xl font-black dynamic-text mb-1">Utkarsh Patil</h3>
+                        <h3 class="text-xl font-black dynamic-text mb-1 text-center">Utkarsh Patil</h3>
                         <p class="text-xs font-bold text-primary uppercase tracking-widest mb-1">Treasurer</p>
                         <span class="phone-num">+91 87886 32561</span>
-                        <div class="flex justify-center gap-3">
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:utkarshpatil330@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Coordinators -->
+            <!-- Executive Members Section -->
             <div class="mb-32">
                 <div class="text-center mb-16 reveal">
+                    <span class="section-tag">Operations</span>
                     <h2 class="text-3xl font-black dynamic-text mt-2">Executive Members</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -363,9 +396,9 @@
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Shubham%20Pete%20.PNG" alt="Shubham Pete" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Shubham Pete</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Management Lead</p>
                         <span class="phone-num">+91 94218 49032</span>
-                        <div class="flex justify-center gap-3">
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:peteshubham91@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
@@ -375,9 +408,9 @@
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/simran.JPG" alt="Simran Khokale" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Simran Khokale</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Coordinator</p>
                         <span class="phone-num">+91 96997 39762</span>
-                        <div class="flex justify-center gap-3">
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:simrankhokale@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
@@ -387,9 +420,9 @@
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Tushar.JPG" alt="Tushar Shinde" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Tushar Shinde</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Coordinator</p>
                         <span class="phone-num">+91 87674 13414</span>
-                        <div class="flex justify-center gap-3">
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:tusharshinde5232@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
@@ -399,56 +432,45 @@
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Vrushali.PNG" alt="Vrushali Dube" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Vrushali Dube</h3>
-                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Executive Member</p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Coordinator</p>
                         <span class="phone-num">+91 90218 37233</span>
-                        <div class="flex justify-center gap-3">
-                            <a href="mailto:#" class="social-link-v2">📧</a>
+                        <div class="mt-auto flex justify-center">
+                            <a href="mailto:vrushalidube@example.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Technical & Media -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Tech Team -->
-                <div>
-                    <div class="mb-12 reveal">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="member-card reveal">
-                            <div class="photo-wrapper h-48">
-                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sai.JPG" alt="Sai Deokar" class="member-img">
-                            </div>
-                            <h3 class="text-lg font-black dynamic-text mb-1">Sai Deokar</h3>
-                            <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Executive Member</p>
-                            <span class="phone-num">+91 80551 07422</span>
-                            <div class="flex justify-center">
-                                <a href="mailto:saideokar35@gmail.com" class="social-link-v2">📧</a>
-                            </div>
+                    <!-- Sai -->
+                    <div class="member-card reveal">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Sai.JPG" alt="Sai Deokar" class="member-img">
                         </div>
-                        <div class="member-card reveal">
-                            <div class="photo-wrapper h-48">
-                                <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Renuka.JPG" alt="Renuka Karle" class="member-img">
-                            </div>
-                            <h3 class="text-lg font-black dynamic-text mb-1">Renuka Karle</h3>
-                            <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Executive Member</p>
-                            <span class="phone-num">+91 73878 30337</span>
-                            <div class="flex justify-center">
-                                <a href="mailto:rtkarle03@gmail.com" class="social-link-v2">📧</a>
-                            </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Sai Deokar</h3>
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Technical Lead</p>
+                        <span class="phone-num">+91 80551 07422</span>
+                        <div class="mt-auto flex justify-center">
+                            <a href="mailto:saideokar35@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
-                </div>
-                <!-- Media -->
-                <div>
+                    <!-- Renuka -->
+                    <div class="member-card reveal">
+                        <div class="photo-wrapper">
+                            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Renuka.JPG" alt="Renuka Karle" class="member-img">
+                        </div>
+                        <h3 class="text-lg font-black dynamic-text mb-1">Renuka Karle</h3>
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Technical Lead</p>
+                        <span class="phone-num">+91 73878 30337</span>
+                        <div class="mt-auto flex justify-center">
+                            <a href="mailto:rtkarle03@gmail.com" class="social-link-v2">📧</a>
+                        </div>
                     </div>
-                    <div class="member-card reveal max-w-sm">
+                    <!-- Viresh -->
+                    <div class="member-card reveal">
                         <div class="photo-wrapper">
                             <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/Viresh%20.JPG" alt="Viresh Nagthane" class="member-img">
                         </div>
                         <h3 class="text-lg font-black dynamic-text mb-1">Viresh Nagthane</h3>
-                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Social Media Manager</p>
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest mb-1">Media Manager</p>
                         <span class="phone-num">+91 87880 21716</span>
-                        <div class="flex justify-center gap-3">
+                        <div class="mt-auto flex justify-center">
                             <a href="mailto:vireshnagthane9@gmail.com" class="social-link-v2">📧</a>
                         </div>
                     </div>
