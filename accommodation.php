@@ -9,7 +9,7 @@
 ob_start();
 header('Content-Type: application/json');
 
-// 1. Database Configuration (Using credentials from register.php)
+// 1. Database Configuration
 $host = 'localhost';
 $db_name = 'techfest_db';
 $username = 'techfest_user';
@@ -43,7 +43,6 @@ try {
         }
 
         // 4. Prepare SQL Statement
-        // Ensure you have created a table named 'stay_requests'
         $sql = "INSERT INTO `stay_requests` (
                     full_name, 
                     college_name, 
@@ -79,7 +78,7 @@ try {
             ob_clean();
             echo json_encode([
                 'status' => 'success', 
-                'message' => 'Stay request received! Our hospitality team will contact you shortly via WhatsApp.'
+                'message' => 'Stay request received! Our hospitality team will verify your UTR and contact you shortly via WhatsApp.'
             ]);
         } else {
             ob_clean();
