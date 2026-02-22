@@ -6,13 +6,10 @@
 
 // --- CONFIGURATION ---
 $ADMIN_PIN = "aditya"; 
-$host = "localhost"; // Usually localhost for MariaDB on same EC2
+$host = "localhost"; 
 $username = 'techfest_user';
 $password = 'StrongPassword123';
 $dbname = "techfest_db";
-
-// Force error reporting for debugging on EC2 if needed (comment out for production)
-// error_reporting(E_ALL); ini_set('display_errors', 1);
 
 session_start();
 
@@ -23,12 +20,9 @@ if ($conn->connect_error) {
             <h3 style='margin-top:0;'>DATABASE CONNECTION ERROR</h3>
             <p>The admin panel cannot connect to MariaDB.</p>
             <p style='font-size:0.8rem; color:#888;'>Error: " . $conn->connect_error . "</p>
-            <hr style='border:0; border-top:1px solid #333;'>
-            <p style='font-size:0.7rem;'>Check if service 'mariadb' is running: <code>sudo systemctl status mariadb</code></p>
          </div>"); 
 }
 
-// Dynamically handle the redirect path
 $self = htmlspecialchars(basename($_SERVER['PHP_SELF']));
 
 // Handle Logout
@@ -43,7 +37,7 @@ $error_msg = "";
 if (isset($_POST['pin_input'])) {
     if ($_POST['pin_input'] === $ADMIN_PIN) {
         $_SESSION['authenticated_owner'] = true;
-        header("Location: $self"); // Refresh to clear POST data
+        header("Location: $self"); 
         exit();
     } else {
         $error_msg = "ACCESS DENIED: INVALID SECURITY PIN.";
@@ -51,11 +45,10 @@ if (isset($_POST['pin_input'])) {
 }
 
 // Determine Current View
-$view = (isset($_GET['view']) && $_GET['view'] === 'queries') ? 'queries' : 'registrations';
+$view = (isset($_GET['view'])) ? $_GET['view'] : 'registrations';
 
 // --- ACTION LOGIC ---
 if (isset($_SESSION['authenticated_owner'])) {
-    // Delete Registration
     if (isset($_GET['delete_reg_id'])) {
         $id = intval($_GET['delete_reg_id']);
         $conn->query("DELETE FROM registrations WHERE id = $id");
@@ -63,7 +56,6 @@ if (isset($_SESSION['authenticated_owner'])) {
         exit();
     }
     
-    // Delete Query
     if (isset($_GET['delete_query_id'])) {
         $id = intval($_GET['delete_query_id']);
         $conn->query("DELETE FROM queries WHERE id = $id");
@@ -71,7 +63,6 @@ if (isset($_SESSION['authenticated_owner'])) {
         exit();
     }
 
-    // Toggle Payment Status (Verify or Revoke)
     if (isset($_GET['toggle_payment']) && isset($_GET['id'])) {
         $id = intval($_GET['id']);
         $new_status = ($_GET['toggle_payment'] === 'Verified') ? 'Verified' : 'Pending';
@@ -83,37 +74,48 @@ if (isset($_SESSION['authenticated_owner'])) {
     }
 }
 
-// --- CSV EXPORT ---
+// --- CSV EXPORT (Updated to match requested image) ---
 if (isset($_SESSION['authenticated_owner']) && isset($_GET['export'])) {
     header('Content-Type: text/csv; charset=utf-8');
-    $filename = ($view == 'registrations') ? 'Techfest_Registrations_' : 'User_Queries_';
-    header('Content-Disposition: attachment; filename=' . $filename . date('Y-m-d') . '.csv');
+    $filename = 'Techfest_Data_' . ucfirst($view) . '_';
+    header('Content-Disposition: attachment; filename=' . $filename . date('Y-m-d_H-i') . '.csv');
     $output = fopen('php://output', 'w');
     
     if ($view == 'registrations') {
-        fputcsv($output, array('ID', 'Name', 'Phone', 'Event', 'Fee', 'Status', 'Date'));
-        $res = $conn->query("SELECT id, lead_name, lead_phone, event_name, total_fee, payment_status, registration_date FROM registrations ORDER BY id DESC");
-    } else {
-        fputcsv($output, array('ID', 'Name', 'Email', 'Subject', 'Message', 'Date'));
-        $res = $conn->query("SELECT * FROM queries ORDER BY id DESC");
+        // Headers matching the provided screenshot
+        fputcsv($output, array('ID', 'Event', 'Category', 'Team Name', 'College', 'Lead Name', 'Email', 'Phone', 'Members', 'Fee', 'UTR/Transaction', 'Status', 'Date'));
+        $res = $conn->query("SELECT id, event_name, category, team_name, college, lead_name, email, lead_phone, members, total_fee, transaction_id, payment_status, registration_date FROM registrations ORDER BY id DESC");
+    } elseif ($view == 'queries') {
+        fputcsv($output, array('ID', 'Name', 'Email', 'Message', 'Date'));
+        $res = $conn->query("SELECT id, name, email, message, created_at FROM queries ORDER BY id DESC");
+    } elseif ($view == 'stay') {
+        fputcsv($output, array('ID', 'Name', 'Phone', 'Duration', 'Gender', 'Status', 'Date'));
+        $res = $conn->query("SELECT * FROM stay_bookings ORDER BY id DESC");
     }
     
-    while ($row = $res->fetch_assoc()) { fputcsv($output, $row); }
+    if(isset($res)){ while ($row = $res->fetch_assoc()) { fputcsv($output, $row); } }
     fclose($output);
     exit();
 }
 
-// Metrics
+// Metrics & Analytics
 $total_participants = $conn->query("SELECT count(*) as count FROM registrations")->fetch_assoc()['count'] ?? 0;
 $total_queries = $conn->query("SELECT count(*) as count FROM queries")->fetch_assoc()['count'] ?? 0;
 $revenue_res = $conn->query("SELECT SUM(total_fee) as total FROM registrations WHERE payment_status = 'Verified'");
 $total_revenue = ($revenue_res && $row = $revenue_res->fetch_assoc()) ? $row['total'] : 0;
 
+// Event-wise Participation Analytics
+$event_stats = $conn->query("SELECT event_name, COUNT(*) as count FROM registrations GROUP BY event_name ORDER BY count DESC");
+
 // Data Fetching
 if ($view == 'registrations') {
     $result = $conn->query("SELECT * FROM registrations ORDER BY id DESC");
-} else {
+} elseif ($view == 'queries') {
     $result = $conn->query("SELECT * FROM queries ORDER BY id DESC");
+} else {
+    // Check if stay table exists to avoid errors
+    $check_stay = $conn->query("SHOW TABLES LIKE 'stay_bookings'");
+    $result = ($check_stay->num_rows > 0) ? $conn->query("SELECT * FROM stay_bookings ORDER BY id DESC") : null;
 }
 ?>
 <!DOCTYPE html>
@@ -128,32 +130,43 @@ if ($view == 'registrations') {
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-dark); color: white; margin: 0; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
         h1 { font-family: 'Orbitron'; color: var(--primary); text-align: center; letter-spacing: 2px; text-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }
-        .metric-card { background: var(--bg-card); border: 1px solid var(--border); padding: 25px; border-radius: 15px; text-align: center; position: relative; }
-        .metric-label { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .metric-value { font-size: 2.2rem; font-weight: 800; font-family: 'Orbitron'; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; }
+        .metric-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; }
+        .metric-label { font-family: 'Orbitron'; font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .metric-value { font-size: 1.8rem; font-weight: 800; font-family: 'Orbitron'; }
+        
+        /* Event Analytics Table */
+        .analytics-section { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 30px; }
+        .analytics-title { font-family: 'Orbitron'; color: var(--primary); font-size: 0.8rem; margin-bottom: 15px; display: block; text-align: center; }
+        .stats-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .stat-tag { background: #000; border: 1px solid var(--primary); padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-family: 'Orbitron'; }
+        .stat-tag span { color: var(--primary); margin-left: 5px; }
+
         .login-overlay { position: fixed; inset: 0; background: var(--bg-dark); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .login-card { background: var(--bg-card); padding: 40px; border-radius: 20px; border: 1px solid var(--primary); text-align: center; width: 350px; box-shadow: 0 0 50px rgba(0, 242, 255, 0.1); }
         .pin-input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 1.5rem; letter-spacing: 5px; outline: none; font-family: Orbitron; }
         .btn-primary { background: var(--primary); color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: Orbitron; }
-        .view-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-        .tab-link { text-decoration: none; padding: 10px 25px; border-radius: 25px; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--text-dim); border: 1px solid var(--border); transition: 0.3s; }
+        
+        .view-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .tab-link { text-decoration: none; padding: 10px 20px; border-radius: 25px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text-dim); border: 1px solid var(--border); transition: 0.3s; }
         .tab-link.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
+        
         .table-wrapper { background: var(--bg-card); border-radius: 15px; overflow-x: auto; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
-        th { background: rgba(255, 255, 255, 0.05); text-align: left; padding: 15px; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--primary); text-transform: uppercase; border-bottom: 1px solid var(--border); }
-        td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.9rem; }
-        .status-badge { padding: 4px 10px; border-radius: 5px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; font-family: 'Orbitron'; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background: rgba(255, 255, 255, 0.05); text-align: left; padding: 15px; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--primary); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.8rem; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 5px; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; font-family: 'Orbitron'; }
         .status-verified { background: rgba(0, 255, 136, 0.1); color: var(--success); border: 1px solid var(--success); }
         .status-pending { background: rgba(255, 170, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
-        .btn-action { text-decoration: none; font-size: 0.7rem; padding: 6px 12px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; display: inline-block; transition: 0.2s; }
+        
+        .btn-action { text-decoration: none; font-size: 0.65rem; padding: 6px 10px; border-radius: 5px; font-family: 'Orbitron'; font-weight: bold; display: inline-block; }
         .btn-verify { background: var(--success); color: #000; }
         .btn-revoke { background: rgba(255, 170, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); margin-right: 5px; }
         .btn-delete { color: var(--danger); border: 1px solid var(--danger); }
-        .btn-delete:hover { background: var(--danger); color: #fff; }
-        .btn-wa { background: #25D366; color: #fff; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-wa { background: #25D366; color: #fff; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; }
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
-        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid var(--primary); }
+        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -162,7 +175,6 @@ if ($view == 'registrations') {
     <div class="login-overlay">
         <div class="login-card">
             <h2 style="font-family: Orbitron; color: var(--primary); margin-bottom: 5px;">ROOT ACCESS</h2>
-            <p style="font-size: 0.6rem; color: var(--text-dim); margin-bottom: 25px; letter-spacing: 2px;">TECHFEST 2.0 ANALYTICS</p>
             <form method="POST">
                 <input type="password" name="pin_input" class="pin-input" placeholder="••••" required autofocus>
                 <button type="submit" class="btn-primary">INITIALIZE UPLINK</button>
@@ -173,82 +185,115 @@ if ($view == 'registrations') {
 <?php else: ?>
     <div class="container">
         <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <span style="font-family:Orbitron; color:var(--primary); font-size:0.7rem;">AWS NODE: <?php echo $_SERVER['SERVER_ADDR']; ?></span>
-            <a href="?logout=1" style="color:var(--text-dim); text-decoration:none; font-size:0.7rem; font-family:Orbitron;">[ TERMINATE SESSION ]</a>
+            <span style="font-family:Orbitron; color:var(--primary); font-size:0.6rem;">AWS NODE: <?php echo $_SERVER['SERVER_ADDR']; ?></span>
+            <a href="?logout=1" style="color:var(--text-dim); text-decoration:none; font-size:0.6rem; font-family:Orbitron;">[ TERMINATE SESSION ]</a>
         </div>
         
         <h1>DASHBOARD ANALYTICS</h1>
 
         <div class="metrics-grid">
-            <div class="metric-card"><span class="metric-label">Users Registered</span><div class="metric-value"><?php echo $total_participants; ?></div></div>
-            <div class="metric-card"><span class="metric-label">Verified Revenue</span><div class="metric-value" style="color:var(--success);">₹<?php echo number_format($total_revenue); ?></div></div>
-            <div class="metric-card"><span class="metric-label">Support Queries</span><div class="metric-value" style="color:var(--primary);"><?php echo $total_queries; ?></div></div>
+            <div class="metric-card"><span class="metric-label">Total Users</span><div class="metric-value"><?php echo $total_participants; ?></div></div>
+            <div class="metric-card"><span class="metric-label">Revenue</span><div class="metric-value" style="color:var(--success);">₹<?php echo number_format($total_revenue); ?></div></div>
+            <div class="metric-card"><span class="metric-label">Queries</span><div class="metric-value" style="color:var(--primary);"><?php echo $total_queries; ?></div></div>
+        </div>
+
+        <!-- Event Analytics Summary -->
+        <div class="analytics-section">
+            <span class="analytics-title">EVENT PARTICIPATION COUNTS</span>
+            <div class="stats-grid">
+                <?php while($stat = $event_stats->fetch_assoc()): ?>
+                    <div class="stat-tag"><?php echo strtoupper(htmlspecialchars($stat['event_name'])); ?>: <span><?php echo $stat['count']; ?></span></div>
+                <?php endwhile; ?>
+            </div>
         </div>
 
         <div class="view-tabs">
             <a href="?view=registrations" class="tab-link <?php echo ($view == 'registrations') ? 'active' : ''; ?>">REGISTRATIONS</a>
             <a href="?view=queries" class="tab-link <?php echo ($view == 'queries') ? 'active' : ''; ?>">QUERIES</a>
+            <a href="?view=stay" class="tab-link <?php echo ($view == 'stay') ? 'active' : ''; ?>">STAY/HOSTEL</a>
         </div>
 
         <div class="table-wrapper">
             <?php if ($view == 'registrations'): ?>
                 <table>
-                    <thead><tr><th>Lead Contact</th><th>Event / Fee</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Lead & Team</th>
+                            <th>College & Email</th>
+                            <th>Event Details</th>
+                            <th>UTR / Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <?php if($result->num_rows > 0): while($row = $result->fetch_assoc()): 
+                        <?php if($result && $result->num_rows > 0): while($row = $result->fetch_assoc()): 
                             $s_class = ($row['payment_status'] == 'Verified') ? 'status-verified' : 'status-pending';
-                            // Updated WhatsApp message text
                             $wa_msg = urlencode("Hello " . $row['lead_name'] . ", your registration for expo at Techfest 2.0 has been VERIFIED. We look forward to seeing you! Stay updated with the latest announcements, schedules, and registration links. Join our official Techfest WhatsApp Group now! https://chat.whatsapp.com/CDIWyEyGRFsHJzLhvOHYhO");
                             $wa_url = "https://wa.me/" . preg_replace('/[^0-9]/', '', $row['lead_phone']) . "?text=" . $wa_msg;
                         ?>
                         <tr>
-                            <td><strong><?php echo htmlspecialchars($row["lead_name"]); ?></strong><br><small style="color:var(--primary);"><?php echo htmlspecialchars($row["lead_phone"]); ?></small></td>
-                            <td><?php echo htmlspecialchars($row["event_name"]); ?><br><span style="color:var(--success);">₹<?php echo $row['total_fee']; ?></span></td>
-                            <td><span class="status-badge <?php echo $s_class; ?>"><?php echo $row['payment_status']; ?></span></td>
                             <td>
-                                <div style="display:flex; gap:8px; align-items:center;">
-                                    <button onclick="showImg('../uploads/<?php echo $row['transaction_proof']; ?>')" class="btn-primary" style="padding:5px 12px; font-size:0.6rem; width:auto;">PROOF</button>
+                                <strong><?php echo htmlspecialchars($row["lead_name"]); ?></strong><br>
+                                <small style="color:var(--primary);"><?php echo htmlspecialchars($row["lead_phone"]); ?></small><br>
+                                <small style="color:var(--text-dim);">Team: <?php echo htmlspecialchars($row["team_name"] ?? 'N/A'); ?></small>
+                            </td>
+                            <td>
+                                <small><?php echo htmlspecialchars($row["college"] ?? 'N/A'); ?></small><br>
+                                <small style="color:var(--text-dim);"><?php echo htmlspecialchars($row["email"] ?? 'N/A'); ?></small>
+                            </td>
+                            <td>
+                                <span style="color:var(--primary);"><?php echo htmlspecialchars($row["event_name"]); ?></span><br>
+                                <small>Fee: ₹<?php echo $row['total_fee']; ?></small><br>
+                                <small style="font-size:0.6rem;">Members: <?php echo htmlspecialchars($row['members'] ?? '1'); ?></small>
+                            </td>
+                            <td>
+                                <code style="font-size:0.7rem; color:var(--text-dim);"><?php echo htmlspecialchars($row["transaction_id"] ?? 'NO UTR'); ?></code><br>
+                                <span class="status-badge <?php echo $s_class; ?>"><?php echo $row['payment_status']; ?></span>
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:5px; align-items:center;">
+                                    <button onclick="showImg('../uploads/<?php echo $row['transaction_proof']; ?>')" class="btn-primary" style="padding:5px 8px; font-size:0.55rem; width:auto;">PROOF</button>
                                     <?php if($row['payment_status'] == 'Pending'): ?>
                                         <a href="?toggle_payment=Verified&id=<?php echo $row['id']; ?>" class="btn-action btn-verify">VERIFY</a>
                                     <?php else: ?>
                                         <a href="?toggle_payment=Pending&id=<?php echo $row['id']; ?>" class="btn-action btn-revoke" onclick="return confirm('Revoke verification?')">REVOKE</a>
-                                        <a href="<?php echo $wa_url; ?>" target="_blank" class="btn-wa" title="Send WA Confirmed">
-                                            <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.512-2.96-2.626-.087-.114-.694-.922-.694-1.758 0-.837.434-1.246.587-1.412.144-.17.315-.21.424-.21.109 0 .21.002.302.007.098.005.23-.037.35.25.132.317.456 1.112.496 1.192.04.08.066.17.013.272-.053.102-.08.175-.162.27-.08.093-.173.205-.246.27-.087.08-.178.166-.076.337.103.17.458.753.985 1.22.68.606 1.254.796 1.431.884.178.088.283.074.388-.047.106-.123.456-.532.578-.714.122-.182.245-.153.413-.091.166.062 1.06.502 1.242.593.182.091.303.136.348.215.045.079.045.457-.1.862z"/></svg>
+                                        <a href="<?php echo $wa_url; ?>" target="_blank" class="btn-wa">
+                                            <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.512-2.96-2.626-.087-.114-.694-.922-.694-1.758 0-.837.434-1.246.587-1.412.144-.17.315-.21.424-.21.109 0 .21.002.302.007.098.005.23-.037.35.25.132.317.456 1.112.496 1.192.04.08.066.17.013.272-.053.102-.08.175-.162.27-.08.093-.173.205-.246.27-.087.08-.178.166-.076.337.103.17.458.753.985 1.22.68.606 1.254.796 1.431.884.178.088.283.074.388-.047.106-.123.456-.532.578-.714.122-.182.245-.153.413-.091.166.062 1.06.502 1.242.593.182.091.303.136.348.215.045.079.045.457-.1.862z"/></svg>
                                         </a>
                                     <?php endif; ?>
-                                    <a href="?delete_reg_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Erase record permanently?')">X</a>
+                                    <a href="?delete_reg_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Delete record?')">X</a>
                                 </div>
                             </td>
                         </tr>
                         <?php endwhile; else: ?>
-                        <tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-dim);">No registration data found in the cloud database.</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding:50px; color:var(--text-dim);">No data found for this view.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
-            <?php else: ?>
+            <?php elseif ($view == 'queries'): ?>
+                <!-- Standard Queries Table -->
                 <table>
-                    <thead><tr><th>User</th><th>Message Payload</th><th>Action</th></tr></thead>
+                    <thead><tr><th>User</th><th>Message</th><th>Action</th></tr></thead>
                     <tbody>
-                        <?php if($result->num_rows > 0): while($row = $result->fetch_assoc()): ?>
+                        <?php if($result && $result->num_rows > 0): while($row = $result->fetch_assoc()): ?>
                         <tr>
-                            <td><strong><?php echo htmlspecialchars($row["name"]); ?></strong><br><small style="color:var(--primary);"><?php echo htmlspecialchars($row["email"]); ?></small></td>
-                            <td style="color:var(--text-dim); font-size:0.85rem;"><?php echo nl2br(htmlspecialchars($row["message"])); ?></td>
+                            <td><strong><?php echo htmlspecialchars($row["name"]); ?></strong><br><small><?php echo htmlspecialchars($row["email"]); ?></small></td>
+                            <td style="color:var(--text-dim);"><?php echo nl2br(htmlspecialchars($row["message"])); ?></td>
                             <td><a href="?delete_query_id=<?php echo $row['id']; ?>" class="btn-action btn-delete" onclick="return confirm('Delete query?')">DELETE</a></td>
                         </tr>
-                        <?php endwhile; else: ?>
-                        <tr><td colspan="3" style="text-align:center; padding:50px; color:var(--text-dim);">The inbox is currently clear.</td></tr>
-                        <?php endif; ?>
+                        <?php endwhile; endif; ?>
                     </tbody>
                 </table>
             <?php endif; ?>
         </div>
+        
         <div style="text-align:center; margin-top:30px;">
-            <a href="?export=csv&view=<?php echo $view; ?>" style="color:var(--primary); font-size:0.7rem; text-decoration:none; font-family:Orbitron; border: 1px solid var(--primary); padding: 8px 20px; border-radius: 20px;">[ EXPORT TO CSV ]</a>
+            <a href="?export=csv&view=<?php echo $view; ?>" style="color:var(--primary); font-size:0.7rem; text-decoration:none; font-family:Orbitron; border: 1px solid var(--primary); padding: 10px 25px; border-radius: 20px;">[ EXPORT <?php echo strtoupper($view); ?> TO CSV ]</a>
         </div>
     </div>
 
     <div id="imgModal" class="modal" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()"><img id="modalImg" src=""></div>
+        <div class="modal-content"><img id="modalImg" src=""></div>
     </div>
 
     <script>
