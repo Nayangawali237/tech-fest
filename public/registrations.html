@@ -7,42 +7,35 @@
     <title>Register | Sanjivani Techfest 2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration (provided by environment)
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sanjivani-techfest-2';
-
+    <script>
+        /**
+         * Logic to save data to AWS MariaDB via PHP
+         */
         window.saveAndRedirect = async (registrationData, redirectUrl) => {
             try {
-                // Ensure authentication first (Mandatory Rule 3)
-                const userCredential = await signInAnonymously(auth);
-                const user = userCredential.user;
-
-                if (!user) throw new Error("Authentication failed");
-
-                // Define path (Mandatory Rule 1)
-                const registrationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'registrations');
-
-                // Save data to Firestore
-                await addDoc(registrationsRef, {
-                    ...registrationData,
-                    userId: user.uid,
-                    createdAt: new Date().toISOString()
+                // Send data to the PHP backend
+                const response = await fetch('registrations.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(registrationData)
                 });
 
-                // Success - redirect
-                window.location.href = redirectUrl;
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Success - redirect to the portal
+                    window.location.href = redirectUrl;
+                } else {
+                    // Show error message from backend
+                    alert("Error: " + result.message);
+                    document.getElementById('redirect-overlay').style.display = 'none';
+                }
             } catch (error) {
-                console.error("Error saving data:", error);
-                // Fallback: Redirect anyway so user isn't blocked, but log error
+                console.error("Connection Error:", error);
+                // Fallback: Redirect anyway if the server is unreachable to prevent blocking the user
                 window.location.href = redirectUrl;
             }
         };
@@ -53,10 +46,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Sanjivani Institutional Color Palette */
-            --primary: #13a085; /* Sanjivani Teal */
+            --primary: #13a085;
             --bg: #fdfdfd;
-            --accent: #fdbb00; /* Sanjivani Action Yellow */
+            --accent: #fdbb00;
             --text-main: #0f172a;
             --text-dim: #64748b;
             --nav-bg: rgba(255, 255, 255, 0.9);
@@ -467,9 +459,9 @@
     <main class="pt-32 pb-40 px-6">
         <div class="max-w-2xl mx-auto">
             <div class="text-center mb-12">
-                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">EduPlusCampus Portal</span>
+                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Database Secured Portal</span>
                 <h1 class="text-5xl font-black mt-4 font-tech tracking-tight dynamic-text">Registration</h1>
-                <p class="dynamic-dim mt-4 text-sm font-light">Fill your team details to proceed to the official portal.</p>
+                <p class="dynamic-dim mt-4 text-sm font-light">Fill your team details to save your record and proceed to payment.</p>
             </div>
 
             <div class="card-modern shadow-2xl">
@@ -528,7 +520,7 @@
                     </div>
                     
                     <div class="p-6 bg-primary/5 border border-primary/10 rounded-2xl text-center">
-                        <p class="text-[9px] dynamic-dim uppercase tracking-widest font-black opacity-60">Connecting to Sanjivani College of Engineering Registration System</p>
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest font-black opacity-60">Saving data to AWS EC2 Cloud Infrastructure</p>
                     </div>
                 </form>
             </div>
@@ -538,7 +530,7 @@
     <!-- Redirect Overlay -->
     <div id="redirect-overlay" class="redirect-overlay">
         <div class="font-tech text-4xl mb-4 animate-pulse">SAVING DATA</div>
-        <p id="redirect_msg" class="text-sm uppercase tracking-widest opacity-80">Connecting to EduPlusCampus...</p>
+        <p id="redirect_msg" class="text-sm uppercase tracking-widest opacity-80">Synchronizing with AWS MariaDB...</p>
         <div class="mt-8">
             <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -554,7 +546,7 @@
         const navContainer = document.getElementById('nav-container');
         const navLinks = document.querySelectorAll('.nav-link');
 
-        // --- THREE.JS ---
+        // --- THREE.JS BACKGROUND ---
         function initThree() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -663,27 +655,21 @@
             const leadName = document.getElementById('lead_name').value;
             const isSolo = eventSelect.options[eventSelect.selectedIndex].getAttribute('data-solo') === 'true';
             
-            // Prepare data object
+            // Prepare data object to match PHP expectations
             const registrationData = {
                 eventName: eventSelect.options[eventSelect.selectedIndex].text,
                 leadName: leadName,
                 leadPhone: leadPhone.value.trim(),
                 teamName: isSolo ? 'Solo Participation' : teamInput.value,
-                members: Array.from(memberContainer.querySelectorAll('input')).map(i => i.value),
-                timestamp: new Date().toISOString()
+                members: Array.from(memberContainer.querySelectorAll('input')).map(i => i.value)
             };
 
             if (url) {
                 overlay.style.display = 'flex';
                 redirectMsg.innerText = `Saving record for ${leadName.split(' ')[0]}...`;
                 
-                // Call global save function defined in module script
-                if (window.saveAndRedirect) {
-                    await window.saveAndRedirect(registrationData, url);
-                } else {
-                    // Fallback if Firebase fails to load
-                    window.location.href = url;
-                }
+                // Call PHP Sync logic
+                await window.saveAndRedirect(registrationData, url);
             }
         });
 
@@ -692,13 +678,6 @@
             if (!element) return;
             navIndicator.style.width = `${element.offsetWidth}px`;
             navIndicator.style.left = `${element.offsetLeft}px`;
-            const scrollLeft = navContainer.scrollLeft;
-            const containerWidth = navContainer.offsetWidth;
-            if (element.offsetLeft < scrollLeft) {
-                navContainer.scrollTo({ left: element.offsetLeft - 20, behavior: 'smooth' });
-            } else if ((element.offsetLeft + element.offsetWidth) > (scrollLeft + containerWidth)) {
-                navContainer.scrollTo({ left: (element.offsetLeft + element.offsetWidth) - containerWidth + 20, behavior: 'smooth' });
-            }
         }
 
         navLinks.forEach(link => {
@@ -711,19 +690,19 @@
             link.addEventListener('mouseleave', () => moveIndicator(document.querySelector('.nav-link.active')));
         });
 
-        const themeToggles = [document.getElementById('theme-btn'), document.getElementById('theme-btn-mobile')];
-        themeToggles.forEach(btn => {
+        const themeBtn = document.getElementById('theme-btn');
+        const themeBtnMobile = document.getElementById('theme-btn-mobile');
+        
+        [themeBtn, themeBtnMobile].forEach(btn => {
             btn?.addEventListener('click', () => {
                 document.body.classList.toggle('dark-mode');
                 const isDark = document.body.classList.contains('dark-mode');
                 const color = isDark ? 0x00f2ff : 0x13a085;
-                const coreOpacity = isDark ? 0.45 : 0.32;
+                
                 coreMesh.material.color.setHex(color);
-                coreMesh.material.opacity = coreOpacity;
                 outerMesh.material.color.setHex(color);
-                outerMesh.material.opacity = coreOpacity / 2.5;
                 particles.material.color.setHex(color);
-                particles.material.opacity = isDark ? 0.75 : 0.65;
+                
                 document.getElementById('sun-icon')?.classList.toggle('hidden');
                 document.getElementById('moon-icon')?.classList.toggle('hidden');
                 setTimeout(() => moveIndicator(document.querySelector('.nav-link.active')), 100);
