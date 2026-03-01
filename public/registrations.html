@@ -1,51 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Techfest 2.0</title>
+    <title>Register | Sanjivani Techfest 2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (provided by environment)
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sanjivani-techfest-2';
+
+        window.saveAndRedirect = async (registrationData, redirectUrl) => {
+            try {
+                // Ensure authentication first (Mandatory Rule 3)
+                const userCredential = await signInAnonymously(auth);
+                const user = userCredential.user;
+
+                if (!user) throw new Error("Authentication failed");
+
+                // Define path (Mandatory Rule 1)
+                const registrationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'registrations');
+
+                // Save data to Firestore
+                await addDoc(registrationsRef, {
+                    ...registrationData,
+                    userId: user.uid,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Success - redirect
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error("Error saving data:", error);
+                // Fallback: Redirect anyway so user isn't blocked, but log error
+                window.location.href = redirectUrl;
+            }
+        };
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Sanjivani Institutional Color Palette */
+            --primary: #13a085; /* Sanjivani Teal */
+            --bg: #fdfdfd;
+            --accent: #fdbb00; /* Sanjivani Action Yellow */
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(19, 160, 133, 0.1);
+            --card-bg: #ffffff;
+            --btn-bg: #13a085;
+            --btn-text: #ffffff;
+            --selection: rgba(19, 160, 133, 0.15);
+            --grid-color: rgba(19, 160, 133, 0.04);
+            --glow: rgba(19, 160, 133, 0.3);
+        }
+
+        body.dark-mode {
             --primary: #00f2ff;
             --bg: #030305;
-            --accent: #7000ff;
+            --accent: #fdbb00;
             --text-main: #ffffff;
             --text-dim: #94a3b8;
             --nav-bg: rgba(10, 10, 15, 0.85);
             --border: rgba(255, 255, 255, 0.1);
             --card-bg: rgba(255, 255, 255, 0.05);
-            --btn-bg: #ffffff;
+            --btn-bg: #fdbb00;
             --btn-text: #000000;
+            --selection: rgba(0, 242, 255, 0.3);
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --glow: rgba(0, 242, 255, 0.4);
         }
 
-        body.light-mode {
-            --bg: #fdfdfd;
-            --text-main: #0f172a;
-            --text-dim: #64748b;
-            --nav-bg: rgba(255, 255, 255, 0.9);
-            --border: rgba(15, 23, 42, 0.08);
-            --card-bg: #ffffff;
-            --primary: #4f46e5;
-            --btn-bg: #0f172a;
-            --btn-text: #ffffff;
+        ::selection {
+            background: var(--selection);
+            color: inherit;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
-            transition: background-color 0.6s ease, color 0.6s ease;
             overflow-x: hidden;
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
+            position: relative;
         }
 
-        .font-tech {
+        h1, h2, h3, h4, h5, .font-tech {
             font-family: 'Orbitron', sans-serif;
+            letter-spacing: -0.02em;
         }
+
+        .dynamic-text { color: var(--text-main); transition: color 0.5s ease; }
+        .dynamic-dim { color: var(--text-dim); transition: color 0.5s ease; }
 
         #bg-canvas {
             position: fixed;
@@ -60,18 +120,48 @@
         .grid-lines {
             position: fixed;
             inset: 0;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 80px 80px;
             z-index: -1;
-            opacity: 0.5;
             pointer-events: none;
+            transition: opacity 0.6s ease;
         }
 
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease, border-color 0.5s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .nav-wrapper {
+            position: fixed;
+            z-index: 100;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (min-width: 1280px) {
+            .nav-wrapper {
+                top: 1.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                width: auto;
+            }
+        }
+
+        @media (max-width: 1279px) {
+            .nav-wrapper {
+                bottom: 1.5rem;
+                left: 1rem;
+                right: 1rem;
+                width: calc(100% - 2rem);
+            }
         }
 
         .nav-float {
@@ -80,441 +170,593 @@
             border: 1px solid var(--border);
             border-radius: 50px;
             padding: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
         }
 
+        .nav-links-container {
+            display: flex;
+            position: relative;
+            z-index: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+        .nav-links-container::-webkit-scrollbar { display: none; }
+
         .nav-link {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-weight: 700;
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 10px 14px;
-            color: var(--text-dim);
-            font-weight: 700;
+            padding: 12px 18px;
+            transition: color 0.4s ease;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
         }
 
-        .nav-link.active {
-            color: var(--primary);
+        .nav-link.active { color: #fff; }
+        body:not(.dark-mode) .nav-link.active { color: #fff; }
+        body.dark-mode .nav-link.active { color: #000; }
+
+        .nav-indicator {
+            position: absolute;
+            height: calc(100% - 8px);
+            top: 4px;
+            left: 4px;
+            background: var(--primary);
+            border-radius: 40px;
+            z-index: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 4px 15px rgba(19, 160, 133, 0.3);
+            pointer-events: none;
         }
 
-        input,
-        select {
-            background: rgba(0, 0, 0, 0.2) !important;
+        .logo-shield {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(19, 160, 133, 0.2);
+            box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode .logo-shield { background: rgba(255, 255, 255, 0.95); }
+
+        .card-modern {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            transition: all 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--glow) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .card-modern:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px -10px var(--glow);
+        }
+
+        .card-modern:hover::before { opacity: 1; }
+
+        input, select {
+            background: rgba(19, 160, 133, 0.03) !important;
             border: 1px solid var(--border) !important;
             color: var(--text-main) !important;
             transition: all 0.3s ease;
+            width: 100%;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
         }
 
-        .light-mode input,
-        .light-mode select {
-            background: rgba(255, 255, 255, 0.8) !important;
-            color: #000 !important;
-        }
-
-        input:focus,
-        select:focus {
+        input:focus, select:focus {
             border-color: var(--primary) !important;
             outline: none;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 15px rgba(19, 160, 133, 0.1);
         }
 
-        .btn-primary {
-            background: var(--btn-bg);
-            color: var(--btn-text);
+        label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-action {
+            background: var(--accent);
+            color: #000;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            box-shadow: 0 10px 20px -5px rgba(253, 187, 0, 0.3);
+            border: none;
+            padding: 1.25rem;
+            border-radius: 16px;
+            cursor: pointer;
+            width: 100%;
         }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: wait;
-        }
-
-        .btn-primary:not(:disabled):hover {
+        .btn-action:hover:not(:disabled) {
             transform: scale(1.02);
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+            filter: brightness(1.1);
+            box-shadow: 0 15px 30px -5px rgba(253, 187, 0, 0.4);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
         }
 
         .theme-toggle {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--text-main);
             cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.3s ease;
         }
 
-        #status-msg {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 700;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            min-width: 280px;
-        }
-
-        .modal-overlay {
+        .redirect-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 200;
+            background: rgba(19, 160, 133, 0.95);
+            z-index: 1000;
             display: none;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            color: white;
+            text-align: center;
+            padding: 2rem;
         }
 
-        .modal-content {
-            width: 100%;
-            max-width: 480px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(20px);
+        .form-section {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
+        .form-section.active {
+            max-height: 1500px;
             opacity: 1;
+            margin-top: 2rem;
+        }
+
+        .team-field-wrapper {
+            transition: all 0.4s ease;
+            max-height: 1000px;
+            opacity: 1;
+            overflow: hidden;
+        }
+
+        .team-field-wrapper.hidden-field {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            pointer-events: none;
+        }
+
+        .member-field {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-secondary {
+            background: rgba(19, 160, 133, 0.1);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 9px;
+            text-transform: uppercase;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
         }
     </style>
 </head>
 
-<body class="min-h-screen">
+<body>
+    <div class="cursor hidden md:block"></div>
     <canvas id="bg-canvas"></canvas>
     <div class="grid-lines"></div>
 
-    <header class="fixed top-6 left-0 w-full z-[100] px-6">
+    <!-- Header (Desktop) -->
+    <header class="fixed top-0 left-0 w-full z-[90] px-6 py-4 hidden lg:block bg-white/10 backdrop-blur-md border-b border-black/5">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="index.html" class="font-tech font-black text-lg tracking-tighter uppercase">Techfest 2.0</a>
+            <div class="logo">
+                <a href="index.html" class="flex items-center group">
+                    <div class="logo-shield">
+                        <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/image-Picsart-AiImageEnhancer.png" alt="Sanjivani Logo" class="h-10 w-auto object-contain">
+                    </div>
+                </a>
+            </div>
             <div class="flex items-center gap-4">
-                <nav class="nav-float hidden md:flex items-center px-4">
-                    <a href="index.html" class="nav-link">Home</a>
-                    <a href="events.html" class="nav-link">Events</a>
-                    <a href="registrations.html" class="nav-link active">Register</a>
-                    <a href="contact.html" class="nav-link">Contact</a>
-                </nav>
-                <button class="theme-toggle" id="theme-btn">
-                    <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path id="theme-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                <button class="theme-toggle" id="theme-btn" aria-label="Toggle Theme">
+                    <svg id="sun-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="pt-32 pb-20 px-6">
+    <!-- Header (Mobile) -->
+    <header class="fixed top-0 left-0 w-full z-[90] p-4 lg:hidden flex justify-between items-center bg-white/30 backdrop-blur-xl border-b border-black/5">
+        <div class="logo-shield !p-1.5 !rounded-lg">
+            <img src="https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/image-Picsart-AiImageEnhancer.png" alt="Sanjivani Logo" class="h-8 w-auto">
+        </div>
+        <button class="theme-toggle" id="theme-btn-mobile" aria-label="Toggle Theme">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        </button>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-wrapper" id="nav-wrap">
+        <div class="nav-float flex overflow-hidden">
+            <div class="nav-indicator" id="nav-indicator"></div>
+            <div class="nav-links-container" id="nav-container">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Events</a>
+                <a href="registrations.html" class="nav-link active">Register</a>
+                <a href="accommodation.html" class="nav-link">Stay</a>
+                <a href="team.html" class="nav-link">Team</a>
+                <a href="sponsors.html" class="nav-link">Sponsors</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Content -->
+    <main class="pt-32 pb-40 px-6">
         <div class="max-w-2xl mx-auto">
             <div class="text-center mb-12">
-                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">Secure Your Slot</span>
-                <h1 class="text-5xl font-black mt-4 font-tech tracking-tight">Registration</h1>
+                <span class="text-primary font-black uppercase tracking-[0.4em] text-[10px]">EduPlusCampus Portal</span>
+                <h1 class="text-5xl font-black mt-4 font-tech tracking-tight dynamic-text">Registration</h1>
+                <p class="dynamic-dim mt-4 text-sm font-light">Fill your team details to proceed to the official portal.</p>
             </div>
 
-            <div class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl">
-                <form id="regForm" class="space-y-8">
-                    <!-- Hidden field to satisfy PHP expectations -->
-                    <input type="hidden" name="category" value="General">
-
+            <div class="card-modern shadow-2xl">
+                <form id="reg_process_form" class="space-y-6">
                     <div>
-                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Target Event</label>
-                        <select name="event_name" id="event_name" required class="w-full rounded-xl px-5 py-4">
-                            <option value="" disabled selected>Select an event...</option>
-                            <option value="Project Expo" data-title="Project Expo" data-type="team" data-max="4">Project Expo (₹199/person)</option>
-                            <option value="CAD Competition" data-title="CAD Competition" data-type="solo" data-max="1">CAD Competition (₹199)</option>
-                            <option value="Code Competition" data-title="Code Competition" data-type="solo" data-max="1">Code Competition (₹199)</option>
-                            <option value="Robo Race" data-title="Robo Race" data-type="team" data-max="4">Robo Race (₹199/person)</option>
-                            <option value="Poster Competition" data-title="Poster Competition" data-type="team" data-max="4">Poster Competition (₹199/person)</option>
-                            <option value="Startup Pitch" data-title="Startup Pitch" data-type="team" data-max="4">Startup Pitch (₹199/person)</option>
-                            <option value="Tower Challenge" data-title="Tower Challenge" data-type="team" data-max="4">Tower Challenge (₹199/person)</option>
+                        <label for="event_select">Competition Name</label>
+                        <select id="event_select" required>
+                            <option value="" disabled selected>Choose your event...</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-Project-Expo2025">Project Expo 2025 (Team of 4)</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-CAD-Competition2025" data-solo="true">CAD Competition 2025 (Solo)</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-CODE-Competition2025" data-solo="true">Code Competition 2025 (Solo)</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-ROBO-Race2025">Robo Race 2025 (Team of 4)</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-Poster-Competition2025">Poster Competition 2025 (Team of 4)</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-Startup-Pitch2025">Startup Pitch 2025 (Team of 4)</option>
+                            <option value="https://mysanjivani.edupluscampus.com/event/Techfest-Tower-Challange2025">Tower Challenge 2025 (Team of 4)</option>
                         </select>
                     </div>
 
-                    <div id="team_info_group" class="hidden space-y-6">
-                        <div>
-                            <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-3">Team Name</label>
-                            <input type="text" name="team_name" id="team_name" placeholder="Enter team name" class="w-full rounded-xl px-5 py-4">
-                        </div>
-                        <div id="members_container" class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Team Members (Max 4 more)</label>
-                                <button type="button" id="add_member_btn" class="text-[9px] font-black bg-primary/10 text-primary border border-primary/20 px-4 py-2 rounded-full hover:bg-primary hover:text-black transition-all">
-                                    + Add Member
-                                </button>
+                    <div id="details_section" class="form-section">
+                        <!-- Lead Details -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label for="lead_name">Lead Participant Name</label>
+                                <input type="text" id="lead_name" placeholder="Enter Full Name" required>
                             </div>
-                            <div id="members_list" class="space-y-3"></div>
+                            <div>
+                                <label for="lead_phone">WhatsApp Number</label>
+                                <input type="tel" id="lead_phone" value="+91 " placeholder="10-digit number" required>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="pt-6 border-t border-white/10">
-                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary mb-6">Lead Participant Details</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <input type="text" name="lead_name" placeholder="Full Name" required class="w-full rounded-xl px-5 py-4">
-                            <input type="tel" name="lead_phone" placeholder="WhatsApp Number" required class="w-full rounded-xl px-5 py-4">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <input type="email" name="lead_email" placeholder="Email Address" required class="w-full rounded-xl px-5 py-4">
-                            <input type="text" name="college" placeholder="College Name" value="Sanjivani College of Engineering" required class="w-full rounded-xl px-5 py-4">
-                        </div>
-                    </div>
+                        <!-- Team Info (Only for Non-Solo) -->
+                        <div id="team_info_wrapper" class="team-field-wrapper space-y-6">
+                            <div>
+                                <label for="team_name">Team Name</label>
+                                <input type="text" id="team_name" placeholder="Enter Team Name">
+                            </div>
 
-                    <button type="button" id="proceedBtn" class="btn-primary w-full py-5 rounded-2xl text-sm shadow-xl shadow-primary/10">
-                        Proceed to Payment
-                    </button>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <label>Team Members</label>
+                                    <button type="button" id="add_member_btn" class="btn-secondary">
+                                        + Add Member
+                                    </button>
+                                </div>
+                                <div id="member_fields_container" class="space-y-3">
+                                    <!-- Additional members added here -->
+                                </div>
+                                <p class="text-[9px] opacity-60 uppercase tracking-wider">Total capacity: 4 members (Lead + 3 additional)</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submit_btn" class="btn-action mt-8">
+                            Proceed to Official Portal
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 bg-primary/5 border border-primary/10 rounded-2xl text-center">
+                        <p class="text-[9px] dynamic-dim uppercase tracking-widest font-black opacity-60">Connecting to Sanjivani College of Engineering Registration System</p>
+                    </div>
                 </form>
             </div>
         </div>
     </main>
 
-    <!-- Payment Modal -->
-    <div id="paymentModal" class="modal-overlay">
-        <div class="modal-content glass-card rounded-3xl p-8 shadow-2xl relative">
-            <button type="button" id="closeModal" class="absolute top-4 right-4 text-dim hover:text-white transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-
-            <div class="text-center space-y-6">
-                <div class="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-                    <span id="modal_event_title" class="text-primary font-bold text-xs uppercase tracking-widest">Event</span>
-                    <div class="flex justify-between items-center mt-2">
-                        <span id="modal_fee_calc" class="text-[10px] font-bold opacity-60 uppercase">₹199 × 1</span>
-                        <span id="modal_amount" class="text-2xl font-black font-tech text-primary">₹199</span>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="space-y-3">
-                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Scan QR to Pay</h3>
-                        <div class="bg-white p-3 rounded-xl inline-block mx-auto border-2 border-primary/20">
-                            <img id="payment_qr_img" src="" alt="Payment QR" class="w-44 h-44 object-contain">
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 pt-4 border-t border-white/10">
-                        <h3 class="text-[10px] uppercase font-black tracking-widest text-primary">Receive UPI Request</h3>
-                        <div class="space-y-3">
-                            <input type="text" id="user_upi_id" placeholder="Enter your UPI ID (Optional)" class="w-full rounded-xl px-4 py-4 text-sm font-mono text-center border border-primary/10">
-                            <button type="button" id="pay_via_upi_btn" class="bg-primary text-black font-black text-[10px] uppercase tracking-widest px-6 py-4 rounded-xl w-full hover:scale-[1.02] transition-transform">
-                                Launch Payment Request
-                            </button>
-                            <p class="text-[9px] opacity-60">Redirects to your UPI app for secure payment.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- UTR Input Section -->
-                <div class="space-y-4 pt-6 border-t border-white/10 text-left">
-                    <div class="space-y-3">
-                        <label class="block text-[10px] uppercase font-black tracking-widest text-primary">Confirm Transaction UTR (12-Digits)</label>
-                        <input type="text" id="transaction_id" maxlength="12" placeholder="Enter 12-Digit UTR" class="w-full rounded-xl px-5 py-4 font-mono text-sm tracking-[0.2em] text-center border border-primary/30">
-                        <p class="text-[9px] opacity-60 italic text-center">Required to auto-verify your slot instantly.</p>
-                    </div>
-                </div>
-
-                <button type="button" id="finalSubmitBtn" class="btn-primary w-full py-5 rounded-2xl text-xs">
-                    Finish & Secure Slot
-                </button>
-            </div>
+    <!-- Redirect Overlay -->
+    <div id="redirect-overlay" class="redirect-overlay">
+        <div class="font-tech text-4xl mb-4 animate-pulse">SAVING DATA</div>
+        <p id="redirect_msg" class="text-sm uppercase tracking-widest opacity-80">Connecting to EduPlusCampus...</p>
+        <div class="mt-8">
+            <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
         </div>
     </div>
 
-    <div id="status-msg"></div>
-
     <script>
-        // --- THREE.JS BACKGROUND ---
-        let scene, camera, renderer, coreMesh;
+        let scene, camera, renderer, coreMesh, outerMesh, particles;
+        let mouseX = 0, mouseY = 0;
+        const navIndicator = document.getElementById('nav-indicator');
+        const navContainer = document.getElementById('nav-container');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        // --- THREE.JS ---
         function initThree() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
+            camera.position.z = 6;
+
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
-            
-            const geometry = new THREE.IcosahedronGeometry(2.5, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
-            coreMesh = new THREE.Mesh(geometry, material);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const geom = new THREE.IcosahedronGeometry(2.2, 1);
+            const mat = new THREE.MeshBasicMaterial({ color: 0x13a085, wireframe: true, transparent: true, opacity: 0.32 });
+            coreMesh = new THREE.Mesh(geom, mat);
             scene.add(coreMesh);
-            
+
+            const outerGeom = new THREE.IcosahedronGeometry(3.5, 1);
+            const outerMat = new THREE.MeshBasicMaterial({ color: 0x13a085, wireframe: true, transparent: true, opacity: 0.12 });
+            outerMesh = new THREE.Mesh(outerGeom, outerMat);
+            scene.add(outerMesh);
+
+            const pGeom = new THREE.BufferGeometry();
+            const pCount = 2200; 
+            const pArr = new Float32Array(pCount * 3);
+            for(let i=0; i<pCount*3; i++) pArr[i] = (Math.random()-0.5) * 18;
+            pGeom.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
+            particles = new THREE.Points(pGeom, new THREE.PointsMaterial({ size: 0.045, color: 0x13a085, transparent: true, opacity: 0.65 }));
+            scene.add(particles);
+
             animate();
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if (coreMesh) coreMesh.rotation.y += 0.002;
+            if(coreMesh) { coreMesh.rotation.y += 0.0018; coreMesh.rotation.x += 0.001; }
+            if(outerMesh) { outerMesh.rotation.y -= 0.0008; outerMesh.rotation.z += 0.0005; }
+            if(particles) { particles.rotation.y -= 0.0003; }
+            camera.position.x += (mouseX * 0.8 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 0.8 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        // --- FORM LOGIC ---
+        const eventSelect = document.getElementById('event_select');
+        const detailsSection = document.getElementById('details_section');
+        const teamWrapper = document.getElementById('team_info_wrapper');
+        const teamInput = document.getElementById('team_name');
+        const leadPhone = document.getElementById('lead_phone');
+        const addMemberBtn = document.getElementById('add_member_btn');
+        const memberContainer = document.getElementById('member_fields_container');
+        const regForm = document.getElementById('reg_process_form');
+        const overlay = document.getElementById('redirect-overlay');
+        const redirectMsg = document.getElementById('redirect_msg');
+
+        let additionalMemberCount = 0;
+
+        leadPhone.addEventListener('input', (e) => {
+            if (!e.target.value.startsWith('+91 ')) { e.target.value = '+91 '; }
         });
 
-        // --- FORM LOGIC ---
-        const eventSelect = document.getElementById('event_name');
-        const teamInfoGroup = document.getElementById('team_info_group');
-        const membersList = document.getElementById('members_list');
-        const addMemberBtn = document.getElementById('add_member_btn');
-        const regForm = document.getElementById('regForm');
-        const statusMsg = document.getElementById('status-msg');
-        const proceedBtn = document.getElementById('proceedBtn');
-        const paymentModal = document.getElementById('paymentModal');
-        const closeModal = document.getElementById('closeModal');
-        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
-        const transactionIdInput = document.getElementById('transaction_id');
-        const paymentQrImg = document.getElementById('payment_qr_img');
-        const payViaUpiBtn = document.getElementById('pay_via_upi_btn');
-
-        // Dynamic QR Assets Mapping
-        const PRICING_MAP = {
-            1: { price: 199, qr: "https://raw.githubusercontent.com/Nayangawali237/tech-fest/main/assets/images/199.png" },
-            2: { price: 398, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/399.jpeg" },
-            3: { price: 597, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/599.jpeg" },
-            4: { price: 796, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" },
-            5: { price: 995, qr: "https://raw.githubusercontent.com/Nayangawali237/techfest2.0/main/images/799.jpeg" } // Fallback
-        };
-
-        function updatePrice() {
-            const memberCount = membersList.children.length + 1;
-            const selected = eventSelect.options[eventSelect.selectedIndex];
-            const eventTitle = selected ? selected.getAttribute('data-title') : 'Registration';
-            const pricing = PRICING_MAP[memberCount] || PRICING_MAP[1];
-
-            document.getElementById('modal_event_title').innerText = eventTitle;
-            document.getElementById('modal_fee_calc').innerText = `₹199 × ${memberCount}`;
-            document.getElementById('modal_amount').innerText = `₹${pricing.price}`;
-            paymentQrImg.src = pricing.qr;
-        }
-
         eventSelect.addEventListener('change', () => {
-            const selected = eventSelect.options[eventSelect.selectedIndex];
-            const type = selected.getAttribute('data-type');
-            if (type === 'team') {
-                teamInfoGroup.classList.remove('hidden');
-                document.getElementById('team_name').required = true;
-            } else {
-                teamInfoGroup.classList.add('hidden');
-                document.getElementById('team_name').required = false;
-                membersList.innerHTML = '';
+            if (eventSelect.value) {
+                detailsSection.classList.add('active');
+                const isSolo = eventSelect.options[eventSelect.selectedIndex].getAttribute('data-solo') === 'true';
+                
+                if (isSolo) {
+                    teamWrapper.classList.add('hidden-field');
+                    teamInput.required = false;
+                    teamInput.value = "";
+                    memberContainer.innerHTML = "";
+                    additionalMemberCount = 0;
+                } else {
+                    teamWrapper.classList.remove('hidden-field');
+                    teamInput.required = true;
+                }
             }
-            updatePrice();
         });
 
         addMemberBtn.addEventListener('click', () => {
-            const selected = eventSelect.options[eventSelect.selectedIndex];
-            const maxAllowedMembers = parseInt(selected.getAttribute('data-max')); // This is the limit for additional members
-            
-            if (membersList.children.length >= maxAllowedMembers) {
-                showMsg(`Max ${maxAllowedMembers} additional members allowed for this event`, "error");
-                return;
-            }
-
-            const div = document.createElement('div');
-            div.className = 'flex gap-2 animate-pulse';
-            div.innerHTML = `
-                <input type="text" name="member_names[]" placeholder="Full Name" required class="flex-1 rounded-xl px-5 py-3 text-sm">
-                <button type="button" class="px-3 text-red-500 hover:bg-red-500/10 rounded-xl" onclick="this.parentElement.remove(); updatePrice();">✕</button>
-            `;
-            membersList.appendChild(div);
-            setTimeout(() => div.classList.remove('animate-pulse'), 500);
-            updatePrice();
-        });
-
-        proceedBtn.addEventListener('click', () => {
-            if (regForm.checkValidity()) {
-                updatePrice();
-                paymentModal.classList.add('active');
-            } else {
-                regForm.reportValidity();
-            }
-        });
-
-        closeModal.addEventListener('click', () => paymentModal.classList.remove('active'));
-
-        // --- UPI DEEP LINK REDIRECT ---
-        payViaUpiBtn.addEventListener('click', () => {
-            const merchantVpa = "mab.037322028260133@axisbank";
-            const amount = document.getElementById('modal_amount').innerText.replace('₹', '');
-            const eventName = eventSelect.options[eventSelect.selectedIndex]?.getAttribute('data-title') || "Techfest";
-            
-            // Generate standard UPI Payment Intent URL
-            const intent = `upi://pay?pa=${merchantVpa}&pn=TECHFEST_2_0&am=${amount}&cu=INR&tn=Reg_${eventName.replace(/\s+/g, '_')}`;
-            
-            // Redirect to trigger UPI apps on mobile
-            window.location.href = intent;
-        });
-
-        // --- SUBMISSION HANDLER ---
-        finalSubmitBtn.addEventListener('click', async () => {
-            const utr = transactionIdInput.value.trim();
-            
-            if (utr.length < 10) {
-                showMsg("Please enter a valid 12-digit UTR number", "error");
-                return;
-            }
-
-            finalSubmitBtn.disabled = true;
-            finalSubmitBtn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Validating...`;
-
-            const formData = new FormData(regForm);
-            formData.append('utr', utr); // Explicitly bind utr key
-
-            try {
-                const response = await fetch('registrations.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    showMsg(result.message, "success");
-                    regForm.reset();
-                    paymentModal.classList.remove('active');
-                    membersList.innerHTML = '';
-                    setTimeout(() => location.reload(), 3000);
-                } else {
-                    showMsg(result.message, "error");
+            if (additionalMemberCount < 3) {
+                additionalMemberCount++;
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'flex gap-2 member-field';
+                memberDiv.innerHTML = `
+                    <input type="text" placeholder="Member ${additionalMemberCount + 1} Name" required>
+                    <button type="button" class="px-4 text-red-500 hover:bg-red-500/10 rounded-xl" onclick="removeMember(this)">✕</button>
+                `;
+                memberContainer.appendChild(memberDiv);
+                
+                if (additionalMemberCount >= 3) {
+                    addMemberBtn.disabled = true;
+                    addMemberBtn.style.opacity = '0.5';
                 }
-            } catch (error) {
-                showMsg("Network error. Please try again or contact support.", "error");
-            } finally {
-                finalSubmitBtn.disabled = false;
-                finalSubmitBtn.innerText = "Finish & Secure Slot";
             }
         });
 
-        function showMsg(text, type) {
-            statusMsg.innerText = text;
-            statusMsg.style.background = type === 'success' ? "rgba(16, 185, 129, 0.95)" : "rgba(239, 68, 68, 0.95)";
-            statusMsg.style.display = 'block';
-            setTimeout(() => { statusMsg.style.display = 'none'; }, 5000);
+        window.removeMember = (btn) => {
+            btn.parentElement.remove();
+            additionalMemberCount--;
+            addMemberBtn.disabled = false;
+            addMemberBtn.style.opacity = '1';
+        };
+
+        regForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = eventSelect.value;
+            const leadName = document.getElementById('lead_name').value;
+            const isSolo = eventSelect.options[eventSelect.selectedIndex].getAttribute('data-solo') === 'true';
+            
+            // Prepare data object
+            const registrationData = {
+                eventName: eventSelect.options[eventSelect.selectedIndex].text,
+                leadName: leadName,
+                leadPhone: leadPhone.value.trim(),
+                teamName: isSolo ? 'Solo Participation' : teamInput.value,
+                members: Array.from(memberContainer.querySelectorAll('input')).map(i => i.value),
+                timestamp: new Date().toISOString()
+            };
+
+            if (url) {
+                overlay.style.display = 'flex';
+                redirectMsg.innerText = `Saving record for ${leadName.split(' ')[0]}...`;
+                
+                // Call global save function defined in module script
+                if (window.saveAndRedirect) {
+                    await window.saveAndRedirect(registrationData, url);
+                } else {
+                    // Fallback if Firebase fails to load
+                    window.location.href = url;
+                }
+            }
+        });
+
+        // --- UI UTILS ---
+        function moveIndicator(element) {
+            if (!element) return;
+            navIndicator.style.width = `${element.offsetWidth}px`;
+            navIndicator.style.left = `${element.offsetLeft}px`;
+            const scrollLeft = navContainer.scrollLeft;
+            const containerWidth = navContainer.offsetWidth;
+            if (element.offsetLeft < scrollLeft) {
+                navContainer.scrollTo({ left: element.offsetLeft - 20, behavior: 'smooth' });
+            } else if ((element.offsetLeft + element.offsetWidth) > (scrollLeft + containerWidth)) {
+                navContainer.scrollTo({ left: (element.offsetLeft + element.offsetWidth) - containerWidth + 20, behavior: 'smooth' });
+            }
         }
 
-        // --- THEME ---
-        const themeBtn = document.getElementById('theme-btn');
-        themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('light-mode');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                moveIndicator(link);
+            });
+            link.addEventListener('mouseenter', (e) => moveIndicator(e.target));
+            link.addEventListener('mouseleave', () => moveIndicator(document.querySelector('.nav-link.active')));
         });
 
-        window.onload = initThree;
+        const themeToggles = [document.getElementById('theme-btn'), document.getElementById('theme-btn-mobile')];
+        themeToggles.forEach(btn => {
+            btn?.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                const color = isDark ? 0x00f2ff : 0x13a085;
+                const coreOpacity = isDark ? 0.45 : 0.32;
+                coreMesh.material.color.setHex(color);
+                coreMesh.material.opacity = coreOpacity;
+                outerMesh.material.color.setHex(color);
+                outerMesh.material.opacity = coreOpacity / 2.5;
+                particles.material.color.setHex(color);
+                particles.material.opacity = isDark ? 0.75 : 0.65;
+                document.getElementById('sun-icon')?.classList.toggle('hidden');
+                document.getElementById('moon-icon')?.classList.toggle('hidden');
+                setTimeout(() => moveIndicator(document.querySelector('.nav-link.active')), 100);
+            });
+        });
+
+        document.querySelectorAll('.card-modern').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+            const cursor = document.querySelector('.cursor');
+            if(cursor) { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
+        });
+
+        window.onload = () => {
+            initThree();
+            moveIndicator(document.querySelector('.nav-link.active'));
+        };
+
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            moveIndicator(document.querySelector('.nav-link.active'));
+        };
     </script>
 </body>
+
 </html>
